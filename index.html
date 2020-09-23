@@ -11,6 +11,7 @@
       margin: 0;
       display: flex;
       flex-direction: column;
+      font-family: monospace;
     }
     section {
       display: flex;
@@ -22,9 +23,10 @@
     }
     table {
       flex: 1;
-      height: 100%;
-      /* width: -webkit-fill-available;
-      height: -webkit-fill-available; */
+      height: calc(100vh - 4rem);
+      width: calc(100vw - 4rem);
+      width: -webkit-fill-available;
+      height: -webkit-fill-available;
     }
     td {
       border: 1px solid #efefef;
@@ -32,6 +34,9 @@
     nav {
       margin: 0;
       height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
     }
     .on {
       background: hsl(calc(var(--row) * 360deg / var(--rows)), 50% , 50%);
@@ -45,7 +50,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.75);
+    }
+
+    input, button, td {
+      cursor: pointer;
     }
   </style>
 </head>
@@ -69,6 +78,18 @@
       <option name="PolySynth">PolySynth</option>
       <option name="PolyFM">PolyFM</option>
     </select>
+    <div>
+      <input type="number" step="1" min="1" max="400" value="120" id="bpmEl"/>
+      <label for="bpmEl">bpm</label>
+    </div>
+    <div>
+      <input type="number" step="1" min="4" max="64" value="16" id="columnsEl"/>
+      <label for="columnsEl">Steps</label>
+    </div>
+    <div>
+      <input type="number" step="1" min="4" max="64" value="16" id="rowsEl"/>
+      <label for="rowsEl">Range</label>
+    </div>
     <button id="clear">Clear</button>
   </nav>
   <script>
@@ -77,10 +98,12 @@
     var clearBtn = document.querySelector('#clear');
     var playPause = document.querySelector('#playPause');
     var instrumentSelector = document.querySelector('#instrumentSelector');
+    var bpmEl = document.querySelector('#bpmEl');
+    var columnsEl = document.querySelector('#columnsEl');
+    var rowsEl = document.querySelector('#rowsEl');
 
     var columns = 16;
     var rows = 16;
-    
     
     var incBy = 0.5;
     
@@ -91,39 +114,61 @@
     var instrument;
     
     var drumSteps = {};
-    var drumNotes = ['kd', 'sd', 'ch', 'oh'];
+    var drumNotes = ['oh', 'ch', 'sd', 'kd'];
     var drumStepsObj = {};
     var drumSequencer;
     var drums;
   
-    function updateColumns(idx, row) {
+    function updateColumns(idx, row, instrument, note) {
       for (var c = 0; c < columns; c++) {
         var cell = document.createElement('td');
+        cell.dataset.note = note;
+        cell.dataset.instrument = instrument;
         cell.style.setProperty('--row', idx);
         row.appendChild(cell);
       }
     }
     
     function updateTable() {
+      table.innerHTML = '';
+      columns = columnsEl.value;
+      rows = rowsEl.value;
       table.style.setProperty('--rows', rows);
       for(var r = 0; r < rows; r++) {
         var note = (rows-r-1)*incBy;
         notes.push(note);
         steps[note] = document.createElement('tr');
         table.appendChild(steps[note]);
-        updateColumns(r, steps[note]);
+        updateColumns(r, steps[note], 'synth', note);
       }
 
       for(var d = 0; d < drumNotes.length; d++) {
         var note = drumNotes[d];
         drumSteps[note] = document.createElement('tr');
         table.appendChild(drumSteps[note]);
-        updateColumns(d, drumSteps[note]);
+        updateColumns(d, drumSteps[note], 'drums', note);
       }
     }
+    function playNote(instrument, note) {
+      if(instrument !== 'drums') {
+        window[instrumentSelector.value]().note(Number(note));
+        return;
+      }
+      drums.play(note);
+      return;
+    }
+
     function handleTableClick(e) {
       var td = e.composedPath()[0];
+      if(td.tagName !== 'TD') return;
+      togglePlayPause();
       td.classList.toggle('on');
+      if(td.classList.contains('on')) {
+        playNote(td.dataset.instrument, td.dataset.note);
+      }
+      togglePlayPause();
+    }
+    function updateSequence() {
       stepsObj = {};
       for(var i = 0; i < notes.length; i++) {
         var note = notes[i];
@@ -155,6 +200,7 @@
     }
     function togglePlayPause() {
       if(playPause.textContent === 'Play') {
+        updateSequence();
         sequencer = Gibber.Steps(stepsObj, instrument);
         drumSequencer = Gibber.Steps(drumStepsObj, drums);
         playPause.textContent = 'Stop';
@@ -185,10 +231,16 @@
       }
       togglePlayPause();
     }
+    function updateBpm() {
+      Clock.bpm = bpmEl.value;
+    }
     clearBtn.addEventListener('click', clearGrid);
     loadBtn.addEventListener('click', loadGibber);
     playPause.addEventListener('click', togglePlayPause);
     instrumentSelector.addEventListener('change', updateInstrument);
+    bpmEl.addEventListener('change', updateBpm);
+    columnsEl.addEventListener('change', updateTable);
+    rowsEl.addEventListener('change', updateTable);
     updateTable();
     table.addEventListener('click', handleTableClick);
   </script>
