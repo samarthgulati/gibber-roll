@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gibber Roll</title>
+  <style>
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    section {
+      display: flex;
+      height: calc(100vh - 4rem);
+      width: 100vw;
+    }
+    aside {
+      width: 4rem;  
+    }
+    table {
+      flex: 1;
+      height: 100%;
+      /* width: -webkit-fill-available;
+      height: -webkit-fill-available; */
+    }
+    td {
+      border: 1px solid #efefef;
+    }
+    nav {
+      margin: 0;
+      height: 100%;
+    }
+    .on {
+      background: hsl(calc(var(--row) * 360deg / var(--rows)), 50% , 50%);
+    }
+    #overlay {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <script src="./dist/gibber.audio.js"></script>
+  <script src="./dist/gibberish_worklet.js"></script>
+  <div id="overlay">
+    <button id="load">Start</button>
+  </div>
+  <section>
+    <aside></aside>
+    <table></table>
+  </section>
+  <nav>
+    <button id="playPause">Play</button>
+    <select name="instrument" id="instrumentSelector">
+      <option selected name="Synth">Synth</option>
+      <option name="FM">FM</option>
+      <option name="Monosynth">Monosynth</option>
+      <option name="PolyMono">PolyMono</option>
+      <option name="PolySynth">PolySynth</option>
+      <option name="PolyFM">PolyFM</option>
+    </select>
+    <button id="clear">Clear</button>
+  </nav>
+  <script>
+    var table = document.querySelector('table');
+    var loadBtn = document.querySelector('#load');
+    var clearBtn = document.querySelector('#clear');
+    var playPause = document.querySelector('#playPause');
+    var instrumentSelector = document.querySelector('#instrumentSelector');
+
+    var columns = 16;
+    var rows = 16;
+    var steps = {};
+    var incBy = 0.5;
+    var notes = [];
+    var stepsObj = {};
+    var sequencer;
+    var instrument;
+    
+    function updateTable() {
+      table.style.setProperty('--rows', rows);
+      for (var r = 0; r < rows; r++) {
+        var note = (rows-r-1)*incBy;
+        steps[note] = document.createElement('tr');
+        table.appendChild(steps[note]);
+        for (var c = 0; c < columns; c++) {
+          var cell = document.createElement('td');
+          cell.style.setProperty('--row', r);
+          steps[note].appendChild(cell);
+        }
+      }
+      notes = Object.keys(steps);
+    }
+    function handleTableClick(e) {
+      var td = e.composedPath()[0];
+      td.classList.toggle('on');
+      stepsObj = {};
+      for(var i = 0; i < notes.length; i++) {
+        var note = notes[i];
+        var noteEl = steps[note];
+        stepsObj[note] = '';
+        for(var j = 0; j < noteEl.children.length; j++) {
+          var cell = noteEl.children[j];
+          if(cell.classList.contains('on')) {
+            stepsObj[note] += 'x';
+          } else {
+            stepsObj[note] += '.';
+          }
+        }
+      }
+    }
+    function togglePlayPause() {
+      if(playPause.textContent === 'Play') {
+        sequencer = Gibber.Steps(stepsObj, instrument);
+        playPause.textContent = 'Stop';
+      } else {
+        sequencer.stop();
+        playPause.textContent = 'Play';
+      }
+    }
+    function hideOverlay() {
+      updateInstrument();
+      document.querySelector('#overlay').style.display = 'none';
+    }
+    function loadGibber() {
+      loadBtn.disabled = true;
+      loadBtn.textContent = 'Loading...'
+      Gibber.init()
+      .then(hideOverlay);
+    }
+    function updateInstrument() {
+      instrument = window[instrumentSelector.value]();
+    }
+    function clearGrid() {
+      var onCells = table.querySelectorAll('.on');
+      for(var i = 0; i < onCells.length; i++) {
+        onCells[i].classList.remove('on');
+      }
+      togglePlayPause();
+    }
+    clearBtn.addEventListener('click', clearGrid);
+    loadBtn.addEventListener('click', loadGibber);
+    playPause.addEventListener('click', togglePlayPause);
+    instrumentSelector.addEventListener('change', updateInstrument);
+    updateTable();
+    table.addEventListener('click', handleTableClick);
+  </script>
+</body>
+</html>
