@@ -80,26 +80,46 @@
 
     var columns = 16;
     var rows = 16;
-    var steps = {};
+    
+    
     var incBy = 0.5;
+    
+    var steps = {};
     var notes = [];
     var stepsObj = {};
     var sequencer;
     var instrument;
     
+    var drumSteps = {};
+    var drumNotes = ['kd', 'sd', 'ch', 'oh'];
+    var drumStepsObj = {};
+    var drumSequencer;
+    var drums;
+  
+    function updateColumns(idx, row) {
+      for (var c = 0; c < columns; c++) {
+        var cell = document.createElement('td');
+        cell.style.setProperty('--row', idx);
+        row.appendChild(cell);
+      }
+    }
+    
     function updateTable() {
       table.style.setProperty('--rows', rows);
-      for (var r = 0; r < rows; r++) {
+      for(var r = 0; r < rows; r++) {
         var note = (rows-r-1)*incBy;
+        notes.push(note);
         steps[note] = document.createElement('tr');
         table.appendChild(steps[note]);
-        for (var c = 0; c < columns; c++) {
-          var cell = document.createElement('td');
-          cell.style.setProperty('--row', r);
-          steps[note].appendChild(cell);
-        }
+        updateColumns(r, steps[note]);
       }
-      notes = Object.keys(steps);
+
+      for(var d = 0; d < drumNotes.length; d++) {
+        var note = drumNotes[d];
+        drumSteps[note] = document.createElement('tr');
+        table.appendChild(drumSteps[note]);
+        updateColumns(d, drumSteps[note]);
+      }
     }
     function handleTableClick(e) {
       var td = e.composedPath()[0];
@@ -118,18 +138,35 @@
           }
         }
       }
+      drumStepsObj = {};
+      for(var k = 0; k < drumNotes.length; k++) {
+        var note = drumNotes[k];
+        var noteEl = drumSteps[note];
+        drumStepsObj[note] = '';
+        for(var l = 0; l < noteEl.children.length; l++) {
+          var cell = noteEl.children[l];
+          if(cell.classList.contains('on')) {
+            drumStepsObj[note] += 'x';
+          } else {
+            drumStepsObj[note] += '.';
+          }
+        }
+      }
     }
     function togglePlayPause() {
       if(playPause.textContent === 'Play') {
         sequencer = Gibber.Steps(stepsObj, instrument);
+        drumSequencer = Gibber.Steps(drumStepsObj, drums);
         playPause.textContent = 'Stop';
       } else {
         sequencer.stop();
+        drumSequencer.stop();
         playPause.textContent = 'Play';
       }
     }
     function hideOverlay() {
       updateInstrument();
+      drums = Drums();
       document.querySelector('#overlay').style.display = 'none';
     }
     function loadGibber() {
