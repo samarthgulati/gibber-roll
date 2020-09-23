@@ -161,12 +161,13 @@
     function handleTableClick(e) {
       var td = e.composedPath()[0];
       if(td.tagName !== 'TD') return;
-      togglePlayPause();
+      if(playPause.textContent !== 'Play') {
+        stop();
+      }
       td.classList.toggle('on');
       if(td.classList.contains('on')) {
         playNote(td.dataset.instrument, td.dataset.note);
       }
-      togglePlayPause();
     }
     function updateSequence() {
       stepsObj = {};
@@ -198,16 +199,22 @@
         }
       }
     }
+    function stop() {
+      sequencer.stop();
+      drumSequencer.stop();
+      playPause.textContent = 'Play';
+    }
+    function play() {
+      sequencer = Gibber.Steps(stepsObj, instrument);
+      drumSequencer = Gibber.Steps(drumStepsObj, drums);
+      playPause.textContent = 'Stop';
+    }
     function togglePlayPause() {
       if(playPause.textContent === 'Play') {
         updateSequence();
-        sequencer = Gibber.Steps(stepsObj, instrument);
-        drumSequencer = Gibber.Steps(drumStepsObj, drums);
-        playPause.textContent = 'Stop';
+        play();
       } else {
-        sequencer.stop();
-        drumSequencer.stop();
-        playPause.textContent = 'Play';
+        stop();
       }
     }
     function hideOverlay() {
