@@ -216,6 +216,7 @@
     }
 
     function stop() {
+      if(!sequencer) return;
       sequencer.stop();
       drumSequencer.stop();
       playPause.textContent = 'Play';
@@ -262,6 +263,7 @@
     }
 
     function updateInstrument(e) {
+      stop();
       if(e.target === instrumentSelector) {
         updatePresets();
       }
