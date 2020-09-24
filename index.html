@@ -114,7 +114,7 @@
     var columns = 16;
     var rows = 16;
     
-    var incBy = 0.5;
+    var incBy = 1;
     
     var steps = {};
     var notes = [];
@@ -225,8 +225,8 @@
       var transposedStepsObj = {};
       var transposeBy = Number(transposeEl.value) * incBy;
       var steps = Object.keys(stepsObj);
-      for(var i = 0; i < steps; i++) {
-        var step = steps[i];
+      for(var i = 0; i < steps.length; i++) {
+        var step = Number(steps[i]);
         transposedStepsObj[step + transposeBy] = stepsObj[step];
       }
       return transposedStepsObj;
@@ -312,7 +312,8 @@
     columnsEl.addEventListener('change', updateTable);
     rowsEl.addEventListener('change', updateTable);
     table.addEventListener('click', handleTableClick);
-
+    transposeEl.addEventListener('change', stop);
+    
     updateTable();
   </script>
 </body>
