@@ -130,6 +130,9 @@
     }
     
     function updateTable() {
+      if(playPause.textContent !== 'Play') {
+        stop();
+      }
       table.innerHTML = '';
       columns = columnsEl.value;
       rows = rowsEl.value;
@@ -169,6 +172,7 @@
         playNote(td.dataset.instrument, td.dataset.note);
       }
     }
+
     function updateSequence() {
       stepsObj = {};
       for(var i = 0; i < notes.length; i++) {
@@ -199,16 +203,19 @@
         }
       }
     }
+
     function stop() {
       sequencer.stop();
       drumSequencer.stop();
       playPause.textContent = 'Play';
     }
+
     function play() {
       sequencer = Gibber.Steps(stepsObj, instrument);
       drumSequencer = Gibber.Steps(drumStepsObj, drums);
       playPause.textContent = 'Stop';
     }
+
     function togglePlayPause() {
       if(playPause.textContent === 'Play') {
         updateSequence();
@@ -217,20 +224,24 @@
         stop();
       }
     }
+
     function hideOverlay() {
       updateInstrument();
       drums = Drums();
       document.querySelector('#overlay').style.display = 'none';
     }
+
     function loadGibber() {
       loadBtn.disabled = true;
       loadBtn.textContent = 'Loading...'
       Gibber.init()
       .then(hideOverlay);
     }
+
     function updateInstrument() {
       instrument = window[instrumentSelector.value]();
     }
+
     function clearGrid() {
       var onCells = table.querySelectorAll('.on');
       for(var i = 0; i < onCells.length; i++) {
@@ -238,9 +249,12 @@
       }
       togglePlayPause();
     }
+
     function updateBpm() {
       Clock.bpm = bpmEl.value;
     }
+
+
     clearBtn.addEventListener('click', clearGrid);
     loadBtn.addEventListener('click', loadGibber);
     playPause.addEventListener('click', togglePlayPause);
@@ -248,8 +262,9 @@
     bpmEl.addEventListener('change', updateBpm);
     columnsEl.addEventListener('change', updateTable);
     rowsEl.addEventListener('change', updateTable);
-    updateTable();
     table.addEventListener('click', handleTableClick);
+
+    updateTable();
   </script>
 </body>
 </html>
