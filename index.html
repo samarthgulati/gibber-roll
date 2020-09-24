@@ -31,12 +31,16 @@
     td {
       border: 1px solid #efefef;
     }
-    nav {
+    nav,
+    nav > div {
       margin: 0;
       height: 100%;
       display: flex;
       align-items: center;
       justify-content: space-around;
+    }
+    nav > div > * {
+      margin-left: 0.25rem;
     }
     .on {
       background: hsl(calc(var(--row) * 360deg / var(--rows)), 50% , 50%);
@@ -51,6 +55,10 @@
       align-items: center;
       justify-content: center;
       background: rgba(255, 255, 255, 0.75);
+    }
+
+    button {
+      font-family: monospace;
     }
 
     input, button, td {
@@ -70,15 +78,21 @@
   </section>
   <nav>
     <button id="playPause">Play</button>
-    <select name="instrument" id="instrumentSelector">
-      <option selected name="Synth">Synth</option>
-      <option name="FM">FM</option>
-      <option name="Monosynth">Monosynth</option>
-      <option name="PolyMono">PolyMono</option>
-      <option name="PolySynth">PolySynth</option>
-      <option name="PolyFM">PolyFM</option>
-    </select>
-    <select name="preset" id="presetSelector"></select>
+    <div>
+      <label for="instrumentSelector">Instrument</label>
+      <select name="instrument" id="instrumentSelector">
+        <option selected name="Synth">Synth</option>
+        <option name="FM">FM</option>
+        <option name="Monosynth">Monosynth</option>
+        <option name="PolyMono">PolyMono</option>
+        <option name="PolySynth">PolySynth</option>
+        <option name="PolyFM">PolyFM</option>
+      </select>
+    </div>
+    <div>
+      <label for="presetSelector">Preset</label>
+      <select name="preset" id="presetSelector"></select>
+    </div>
     <div>
       <input type="range" step="1" min="1" max="400" value="120" id="bpmSlider"/>
       <input type="number" step="1" min="1" max="400" value="120" id="bpmEl"/>
@@ -90,7 +104,9 @@
     </div>
     <div>
       <label for="transposeEl">Transpose</label>
+      <button id="octDown">-12</button>
       <input type="number" step="1" min="-36" max="36" value="0" id="transposeEl"/>
+      <button id="octUp">+12</button>
     </div>
     <div style="display: none;">
       <input type="number" step="1" min="4" max="64" value="16" id="rowsEl"/>
@@ -110,6 +126,8 @@
     var columnsEl = document.querySelector('#columnsEl');
     var rowsEl = document.querySelector('#rowsEl');
     var transposeEl = document.querySelector('#transposeEl');
+    var octDown = document.querySelector('#octDown');
+    var octUp = document.querySelector('#octUp');
 
     var columns = 16;
     var rows = 16;
@@ -257,7 +275,7 @@
 
     function loadGibber() {
       loadBtn.disabled = true;
-      loadBtn.textContent = 'Loading...'
+      loadBtn.textContent = 'Loading...';
       Gibber.init()
       .then(hideOverlay);
     }
@@ -294,7 +312,7 @@
     }
 
     function updatePresets() {
-      presetSelector.innerHTML = '<option value=""></option>'
+      presetSelector.innerHTML = '<option value=""></option>';
       var presets = Object.keys(Gibber.Audio.Presets.instruments[instrumentSelector.value]);
       for(var i = 0; i < presets.length; i++) {
         var opt = document.createElement('option');
@@ -302,6 +320,17 @@
         opt.textContent = presets[i];
         presetSelector.appendChild(opt);
       }
+    }
+
+    function updateTranspose(e) {
+      stop();
+      transposeEl.value = Math.max(
+        Number(transposeEl.min), 
+        Math.min(
+          Number(transposeEl.max), 
+          Number(transposeEl.value) + Number(e.target.textContent)
+        )
+      );
     }
 
     clearBtn.addEventListener('click', clearGrid);
@@ -315,6 +344,8 @@
     rowsEl.addEventListener('change', updateTable);
     table.addEventListener('click', handleTableClick);
     transposeEl.addEventListener('change', stop);
+    octUp.addEventListener('click', updateTranspose);
+    octDown.addEventListener('click', updateTranspose);
 
     updateTable();
   </script>
