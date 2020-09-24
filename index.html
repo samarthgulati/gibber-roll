@@ -79,6 +79,7 @@
       <option name="PolyFM">PolyFM</option>
     </select>
     <div>
+      <input type="range" step="1" min="1" max="400" value="120" id="bpmSlider"/>
       <input type="number" step="1" min="1" max="400" value="120" id="bpmEl"/>
       <label for="bpmEl">bpm</label>
     </div>
@@ -98,6 +99,7 @@
     var clearBtn = document.querySelector('#clear');
     var playPause = document.querySelector('#playPause');
     var instrumentSelector = document.querySelector('#instrumentSelector');
+    var bpmSlider = document.querySelector('#bpmSlider');
     var bpmEl = document.querySelector('#bpmEl');
     var columnsEl = document.querySelector('#columnsEl');
     var rowsEl = document.querySelector('#rowsEl');
@@ -254,12 +256,22 @@
       Clock.bpm = bpmEl.value;
     }
 
+    function updateBpmInput() {
+      bpmSlider.value = bpmEl.value;
+      updateBpm();
+    }
+
+    function updateBpmSlider() {
+      bpmEl.value = bpmSlider.value;
+      updateBpm();
+    }
 
     clearBtn.addEventListener('click', clearGrid);
     loadBtn.addEventListener('click', loadGibber);
     playPause.addEventListener('click', togglePlayPause);
     instrumentSelector.addEventListener('change', updateInstrument);
-    bpmEl.addEventListener('change', updateBpm);
+    bpmSlider.addEventListener('input', updateBpmSlider);
+    bpmEl.addEventListener('change', updateBpmInput);
     columnsEl.addEventListener('change', updateTable);
     rowsEl.addEventListener('change', updateTable);
     table.addEventListener('click', handleTableClick);
