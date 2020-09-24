@@ -85,10 +85,14 @@
       <label for="bpmEl">bpm</label>
     </div>
     <div>
-      <input type="number" step="1" min="4" max="64" value="16" id="columnsEl"/>
       <label for="columnsEl">Steps</label>
+      <input type="number" step="1" min="4" max="64" value="16" id="columnsEl"/>
     </div>
     <div>
+      <label for="transposeEl">Transpose</label>
+      <input type="number" step="1" min="0" max="64" value="0" id="transposeEl"/>
+    </div>
+    <div style="display: none;">
       <input type="number" step="1" min="4" max="64" value="16" id="rowsEl"/>
       <label for="rowsEl">Range</label>
     </div>
@@ -105,6 +109,7 @@
     var bpmEl = document.querySelector('#bpmEl');
     var columnsEl = document.querySelector('#columnsEl');
     var rowsEl = document.querySelector('#rowsEl');
+    var transposeEl = document.querySelector('#transposeEl');
 
     var columns = 16;
     var rows = 16;
@@ -142,7 +147,7 @@
       rows = rowsEl.value;
       table.style.setProperty('--rows', rows);
       for(var r = 0; r < rows; r++) {
-        var note = (rows-r-1)*incBy;
+        var note = (rows-r-1) * incBy;
         notes.push(note);
         steps[note] = document.createElement('tr');
         table.appendChild(steps[note]);
@@ -160,7 +165,7 @@
     function playNote(instr, note) {
       if(instr !== 'drums') {
         instrument.stop();
-        instrument.note(Number(note));
+        instrument.note(Number(note) + Number(transposeEl.value) * incBy);
         return;
       }
       drums.play(note);
@@ -216,8 +221,20 @@
       playPause.textContent = 'Play';
     }
 
+    function transposedSteps() {
+      var transposedStepsObj = {};
+      var transposeBy = Number(transposeEl.value) * incBy;
+      var steps = Object.keys(stepsObj);
+      for(var i = 0; i < steps; i++) {
+        var step = steps[i];
+        transposedStepsObj[step + transposeBy] = stepsObj[step];
+      }
+      return transposedStepsObj;
+    }
+
     function play() {
-      sequencer = Gibber.Steps(stepsObj, instrument);
+      var transposedStepsObj = transposedSteps();
+      sequencer = Gibber.Steps(transposedStepsObj, instrument);
       drumSequencer = Gibber.Steps(drumStepsObj, drums);
       playPause.textContent = 'Stop';
     }
