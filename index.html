@@ -234,6 +234,7 @@
         labelsEl.appendChild(label);
         updateColumns(d, drumSteps[note], 'drums', note);
       }
+      updateLabels();
     }
 
     function playNote(instr, note) {
@@ -422,7 +423,6 @@
     octDown.addEventListener('click', updateTranspose);
 
     updateTable();
-    updateLabels();
   </script>
 </body>
 </html>
