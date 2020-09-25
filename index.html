@@ -12,6 +12,7 @@
       display: flex;
       flex-direction: column;
       font-family: monospace;
+      --piano-width: 5rem;
     }
     section {
       display: flex;
@@ -19,18 +20,53 @@
       width: 100vw;
     }
     aside {
-      width: 4rem;  
+      width: var(--piano-width);  
+      white-space: pre;
     }
     table {
       flex: 1;
       height: calc(100vh - 4rem);
-      width: calc(100vw - 4rem);
+      width: calc(100vw - var(--piano-width));
       width: -webkit-fill-available;
       height: -webkit-fill-available;
     }
     td {
       border: 1px solid #efefef;
+      padding: 0;
     }
+    aside {
+      display: flex;
+      flex-direction: column;
+    }
+    aside > span {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    aside > span.black {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%'><rect fill='black' x='25%' y='12.5%' width='75%' height='75%'/><line x1='0%' x2='25%' y1='50%' y2='50%' stroke='black'></line></svg>");
+      color: white;
+    }
+    aside > span.white {
+      color: black;
+    }
+
+    span.white + span.white {
+      border-top: 1px solid black;
+    }
+
+    aside > span.drums {
+      justify-content: center;
+      padding-left: 1rem;
+      text-transform: uppercase;
+      border-top: 1px solid black;
+    }    
+
+    aside > span:last-of-type {
+      border-bottom: 1px solid black;
+    }
+
     nav,
     nav > div {
       margin: 0;
@@ -128,6 +164,20 @@
     var transposeEl = document.querySelector('#transposeEl');
     var octDown = document.querySelector('#octDown');
     var octUp = document.querySelector('#octUp');
+    var labelsEl = document.querySelector('aside');
+
+    var keyboard = buildKeyboard(1, 7);
+
+    function buildKeyboard(min, max) {
+      var notes = ['C ', 'C#', 'D ', 'D#', 'E ', 'F ', 'F#', 'G ', 'G#', 'A ', 'A#', 'B '];
+      var keyboard = [];
+      for(var i = min; i <= max; i++) {
+        for(var j = 0; j < notes.length; j++) {
+          keyboard.push(`${notes[j]} ${i}`);
+        }
+      }
+      return keyboard;
+    }
 
     var columns = 16;
     var rows = 16;
@@ -160,6 +210,7 @@
       if(playPause.textContent !== 'Play') {
         stop();
       }
+      labelsEl.innerHTML = '';
       table.innerHTML = '';
       columns = columnsEl.value;
       rows = rowsEl.value;
@@ -169,6 +220,7 @@
         notes.push(note);
         steps[note] = document.createElement('tr');
         table.appendChild(steps[note]);
+        labelsEl.appendChild(document.createElement('span'));
         updateColumns(r, steps[note], 'synth', note);
       }
 
@@ -176,6 +228,10 @@
         var note = drumNotes[d];
         drumSteps[note] = document.createElement('tr');
         table.appendChild(drumSteps[note]);
+        var label = document.createElement('span');
+        label.textContent = note;
+        label.classList.add('drums');
+        labelsEl.appendChild(label);
         updateColumns(d, drumSteps[note], 'drums', note);
       }
     }
@@ -322,15 +378,33 @@
       }
     }
 
+    function updateLabels() {
+      var startIndex = keyboard.indexOf('C  4') + Number(transposeEl.value);
+      var labels = keyboard.slice(startIndex, startIndex + Number(rowsEl.value));
+      for(var i = 0; i < labels.length; i++) {
+        var labelEl = labelsEl.children[labelsEl.children.length - 5 - i];
+        labelEl.textContent = labels[i];
+        if(labels[i].includes('#')) {
+          labelEl.classList.add('black');
+          labelEl.classList.remove('white');
+        } else {
+          labelEl.classList.remove('black');
+          labelEl.classList.add('white');
+        }
+      }
+    }
+
     function updateTranspose(e) {
       stop();
+      var delta = e.target.tagName === 'BUTTON' ? Number(e.target.textContent) : 0;
       transposeEl.value = Math.max(
         Number(transposeEl.min), 
         Math.min(
           Number(transposeEl.max), 
-          Number(transposeEl.value) + Number(e.target.textContent)
+          Number(transposeEl.value) + delta
         )
       );
+      updateLabels();
     }
 
     clearBtn.addEventListener('click', clearGrid);
@@ -343,11 +417,12 @@
     columnsEl.addEventListener('change', updateTable);
     rowsEl.addEventListener('change', updateTable);
     table.addEventListener('click', handleTableClick);
-    transposeEl.addEventListener('change', stop);
+    transposeEl.addEventListener('change', updateTranspose);
     octUp.addEventListener('click', updateTranspose);
     octDown.addEventListener('click', updateTranspose);
 
     updateTable();
+    updateLabels();
   </script>
 </body>
 </html>
