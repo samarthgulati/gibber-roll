@@ -4,103 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gibber Roll</title>
-  <style>
-    html, body {
-      width: 100vw;
-      height: 100vh;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      font-family: monospace;
-      --piano-width: 5rem;
-    }
-    section {
-      display: flex;
-      height: calc(100vh - 4rem);
-      width: 100vw;
-    }
-    aside {
-      width: var(--piano-width);  
-      white-space: pre;
-    }
-    table {
-      flex: 1;
-      height: calc(100vh - 4rem);
-      width: calc(100vw - var(--piano-width));
-      width: -webkit-fill-available;
-      height: -webkit-fill-available;
-    }
-    td {
-      border: 1px solid #efefef;
-      padding: 0;
-    }
-    aside {
-      display: flex;
-      flex-direction: column;
-    }
-    aside > span {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-    }
-    aside > span.black {
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%'><rect fill='black' x='0%' y='12.5%' width='75%' height='75%'/><line x1='75%' x2='100%' y1='50%' y2='50%' stroke='black'></line></svg>");
-      color: white;
-    }
-    aside > span.white {
-      color: black;
-    }
-
-    span.white + span.white {
-      border-top: 1px solid black;
-    }
-
-    aside > span.drums {
-      justify-content: center;
-      padding-left: 1rem;
-      text-transform: uppercase;
-      border-top: 1px solid black;
-    }    
-
-    aside > span:last-of-type {
-      border-bottom: 1px solid black;
-    }
-
-    nav,
-    nav > div {
-      margin: 0;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-    }
-    nav > div > * {
-      margin-left: 0.25rem;
-    }
-    .on {
-      background: hsl(calc(var(--row) * 360deg / var(--rows)), 50% , 50%);
-    }
-    #overlay {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.75);
-    }
-
-    button {
-      font-family: monospace;
-    }
-
-    input, button, td {
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <script src="./dist/gibber.audio.js"></script>
@@ -202,6 +106,7 @@
         cell.dataset.note = note;
         cell.dataset.instrument = instrument;
         cell.style.setProperty('--row', idx);
+        cell.classList.add(Math.floor(0.25*c) % 2 ? 'light' : 'dark');
         row.appendChild(cell);
       }
     }
@@ -227,6 +132,8 @@
       for(var d = 0; d < drumNotes.length; d++) {
         var note = drumNotes[d];
         drumSteps[note] = document.createElement('tr');
+        drumSteps[note].classList.add('drums');
+        drumSteps[note].style.setProperty('--h', 300*d/4);
         table.appendChild(drumSteps[note]);
         var label = document.createElement('span');
         label.textContent = note;
@@ -380,10 +287,14 @@
     }
 
     function updateLabels() {
-      var startIndex = keyboard.indexOf('C  4') + Number(transposeEl.value);
+      var shift = Number(transposeEl.value);
+      var startIndex = keyboard.indexOf('C  4') + shift;
       var labels = keyboard.slice(startIndex, startIndex + Number(rowsEl.value));
       for(var i = 0; i < labels.length; i++) {
         var labelEl = labelsEl.children[labelsEl.children.length - 5 - i];
+        console.log(360*((i-shift)%12)/12)
+        
+        document.querySelector(`table>tr:nth-of-type(${i+1})`).style.setProperty('--h', 360*((i-shift)%12)/12);
         labelEl.textContent = labels[i];
         if(labels[i].includes('#')) {
           labelEl.classList.add('black');
