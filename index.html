@@ -17,7 +17,6 @@
     <table></table>
   </section>
   <nav>
-    <button id="playPause">Play</button>
     <div>
       <label for="instrumentSelector">Instrument</label>
       <select name="instrument" id="instrumentSelector">
@@ -33,27 +32,51 @@
       <label for="presetSelector">Preset</label>
       <select name="preset" id="presetSelector"></select>
     </div>
+    <fly-out>
+      <button slot="label">Effects</button>
+      <div slot="flyout" hidden>
+        <div>
+          <label for="reverbEl">Reverb</label>
+          <input type="number" step="0.1" min="0" max="1" value="0.5" id="reverbEl"/>
+        </div>
+        <div>
+          <label for="delayEl">Delay</label>
+          <input type="number" step="0.1" min="0" max="1" value="0.5" id="delayEl"/>
+        </div>
+      </div>
+    </fly-out>
+    <button id="playPause">&#9658;</button>
     <div>
-      <input type="range" step="1" min="1" max="400" value="120" id="bpmSlider"/>
-      <input type="number" step="1" min="1" max="400" value="120" id="bpmEl"/>
-      <label for="bpmEl">bpm</label>
+      <label for="bpmEl">Beats per min.</label>
+      <span>
+        <input type="range" step="1" min="1" max="400" value="120" id="bpmSlider"/>
+        <input type="number" step="1" min="1" max="400" value="120" id="bpmEl"/>
+      </span>
     </div>
-    <div>
-      <label for="columnsEl">Steps</label>
-      <input type="number" step="1" min="4" max="64" value="16" id="columnsEl"/>
-    </div>
-    <div>
-      <label for="transposeEl">Transpose</label>
-      <button id="octDown">-12</button>
-      <input type="number" step="1" min="-36" max="36" value="0" id="transposeEl"/>
-      <button id="octUp">+12</button>
-    </div>
-    <div style="display: none;">
-      <input type="number" step="1" min="4" max="64" value="16" id="rowsEl"/>
-      <label for="rowsEl">Range</label>
-    </div>
+    <fly-out>
+      <button slot="label">Settings</button>
+      <div slot="flyout" hidden>
+        <div>
+          <label for="columnsEl">Steps</label>
+          <input type="number" step="1" min="4" max="64" value="16" id="columnsEl"/>
+        </div>
+        <div>
+          <label for="rowsEl">Range</label>
+          <input type="number" step="1" min="4" max="64" value="16" id="rowsEl"/>
+        </div>
+        <div>
+          <label for="transposeEl">Transpose</label>
+          <span>
+            <button id="octDown">-12</button>
+            <input type="number" step="1" min="-36" max="36" value="0" id="transposeEl"/>
+            <button id="octUp">+12</button>
+          </span>
+        </div>
+      </div>
+    </fly-out>
     <button id="clear">Clear</button>
   </nav>
+  <script src="fly-out.js"></script>
   <script>
     var table = document.querySelector('table');
     var loadBtn = document.querySelector('#load');
@@ -112,7 +135,7 @@
     }
     
     function updateTable() {
-      if(playPause.textContent !== 'Play') {
+      if(playPause.textContent !== '►') {
         stop();
       }
       labelsEl.innerHTML = '';
@@ -157,7 +180,7 @@
     function handleTableClick(e) {
       var td = e.composedPath()[0];
       if(td.tagName !== 'TD') return;
-      if(playPause.textContent !== 'Play') {
+      if(playPause.textContent !== '►') {
         stop();
       }
       td.classList.toggle('on');
@@ -201,7 +224,8 @@
       if(!sequencer) return;
       sequencer.stop();
       drumSequencer.stop();
-      playPause.textContent = 'Play';
+      playPause.textContent = '►';
+      playPause.classList.remove('playing');
     }
 
     function transposedSteps() {
@@ -219,11 +243,12 @@
       var transposedStepsObj = transposedSteps();
       sequencer = Gibber.Steps(transposedStepsObj, instrument);
       drumSequencer = Gibber.Steps(drumStepsObj, drums);
-      playPause.textContent = 'Stop';
+      playPause.textContent = '■';
+      playPause.classList.add('playing');
     }
 
     function togglePlayPause() {
-      if(playPause.textContent === 'Play') {
+      if(playPause.textContent === '►') {
         updateSequence();
         play();
       } else {
