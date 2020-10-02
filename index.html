@@ -37,11 +37,11 @@
       <div slot="flyout" hidden>
         <div>
           <label for="reverbEl">Reverb</label>
-          <input type="number" step="0.1" min="0" max="1" value="0.5" id="reverbEl"/>
+          <input type="number" step="0.1" min="0" max="100" value="0.5" id="reverbEl"/>
         </div>
         <div>
           <label for="delayEl">Delay</label>
-          <input type="number" step="0.1" min="0" max="1" value="0.5" id="delayEl"/>
+          <input type="number" step="0.1" min="0" max="100" value="0.5" id="delayEl"/>
         </div>
       </div>
     </fly-out>
@@ -92,6 +92,8 @@
     var octDown = document.querySelector('#octDown');
     var octUp = document.querySelector('#octUp');
     var labelsEl = document.querySelector('aside');
+    var reverbEl = document.querySelector('#reverbEl');
+    var delayEl = document.querySelector('#delayEl');
 
     var keyboard = buildKeyboard(1, 7);
 
@@ -122,6 +124,8 @@
     var drumStepsObj = {};
     var drumSequencer;
     var drums;
+    var reverb;
+    var delay;
   
     function updateColumns(idx, row, instrument, note) {
       for (var c = 0; c < columns; c++) {
@@ -257,8 +261,12 @@
     }
 
     function hideOverlay() {
+      reverb = Bus2().fx.add( Freeverb() );
+      delay = Bus2().fx.add( Delay({ time:1/6, feedback:.75 }) )
       updateInstrument({target: instrumentSelector});
       drums = Drums();
+      drums.connect( reverb, Number(reverbEl.value) );
+      drums.connect( delay, Number(delayEl.value) );
       document.querySelector('#overlay').style.display = 'none';
     }
 
@@ -276,6 +284,8 @@
       }
       var preset = presetSelector.value === '' ? undefined : presetSelector.value;
       instrument = window[instrumentSelector.value](preset);
+      instrument.connect( reverb, Number(reverbEl.value) );
+      instrument.connect( delay, Number(delayEl.value) );
     }
 
     function clearGrid() {
@@ -348,6 +358,16 @@
       updateLabels();
     }
 
+    function updateReverb() {
+      instrument.disconnect( reverb );
+      instrument.connect( reverb, Number(reverbEl.value) );
+    }
+
+    function updateDelay() {
+      instrument.disconnect( delay );
+      instrument.connect( delay, Number(delayEl.value) );
+    }
+
     clearBtn.addEventListener('click', clearGrid);
     loadBtn.addEventListener('click', loadGibber);
     playPause.addEventListener('click', togglePlayPause);
@@ -361,6 +381,8 @@
     transposeEl.addEventListener('change', updateTranspose);
     octUp.addEventListener('click', updateTranspose);
     octDown.addEventListener('click', updateTranspose);
+    reverbEl.addEventListener('change', updateReverb);
+    delayEl.addEventListener('change', updateDelay);
 
     updateTable();
   </script>
