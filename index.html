@@ -118,12 +118,14 @@
     var stepsObj = {};
     var sequencer;
     var instrument;
+    var previewInstrument;
     
     var drumSteps = {};
     var drumNotes = ['oh', 'ch', 'sd', 'kd'];
     var drumStepsObj = {};
     var drumSequencer;
     var drums;
+    var previewDrums;
     var reverb;
     var delay;
   
@@ -173,23 +175,25 @@
 
     function playNote(instr, note) {
       if(instr !== 'drums') {
-        instrument.stop();
-        instrument.note(Number(note) + Number(transposeEl.value) * incBy);
+        // instrument.stop();
+        previewInstrument.note(Number(note) + Number(transposeEl.value) * incBy);
         return;
       }
-      drums.play(note);
+      previewDrums.play(note);
       return;
     }
 
     function handleTableClick(e) {
       var td = e.composedPath()[0];
       if(td.tagName !== 'TD') return;
-      if(playPause.textContent !== '►') {
-        stop();
-      }
       td.classList.toggle('on');
       if(td.classList.contains('on')) {
         playNote(td.dataset.instrument, td.dataset.note);
+      }
+      if(playPause.textContent !== '►') {
+        stop();
+        updateSequence();
+        play();
       }
     }
 
@@ -269,6 +273,11 @@
       drums = Drums();
       drums.connect( reverb );
       drums.connect( delay );
+
+      previewDrums = Drums();
+      previewDrums.connect( reverb );
+      previewDrums.connect( delay );
+      
       document.querySelector('#overlay').style.display = 'none';
     }
 
@@ -288,6 +297,10 @@
       instrument = window[instrumentSelector.value](preset);
       instrument.connect( reverb );
       instrument.connect( delay );
+
+      previewInstrument = window[instrumentSelector.value](preset);
+      previewInstrument.connect( reverb );
+      previewInstrument.connect( delay );
     }
 
     function clearGrid() {
