@@ -41,7 +41,7 @@
         </div>
         <div>
           <label for="delayEl">Delay</label>
-          <input type="number" step="0.1" min="0" max="100" value="0.5" id="delayEl"/>
+          <input type="number" step="0.1" min="0" max="100" value="0" id="delayEl"/>
         </div>
       </div>
     </fly-out>
@@ -264,9 +264,11 @@
       reverb = Bus2().fx.add( Freeverb() );
       delay = Bus2().fx.add( Delay({ time:1/6, feedback:.75 }) )
       updateInstrument({target: instrumentSelector});
+      updateReverb();
+      updateDelay();
       drums = Drums();
-      drums.connect( reverb, Number(reverbEl.value) );
-      drums.connect( delay, Number(delayEl.value) );
+      drums.connect( reverb );
+      drums.connect( delay );
       document.querySelector('#overlay').style.display = 'none';
     }
 
@@ -284,8 +286,8 @@
       }
       var preset = presetSelector.value === '' ? undefined : presetSelector.value;
       instrument = window[instrumentSelector.value](preset);
-      instrument.connect( reverb, Number(reverbEl.value) );
-      instrument.connect( delay, Number(delayEl.value) );
+      instrument.connect( reverb );
+      instrument.connect( delay );
     }
 
     function clearGrid() {
@@ -359,13 +361,11 @@
     }
 
     function updateReverb() {
-      instrument.disconnect( reverb );
-      instrument.connect( reverb, Number(reverbEl.value) );
+      reverb.gain = Number(reverbEl.value);
     }
 
     function updateDelay() {
-      instrument.disconnect( delay );
-      instrument.connect( delay, Number(delayEl.value) );
+      delay.gain = Number(delayEl.value);
     }
 
     clearBtn.addEventListener('click', clearGrid);
