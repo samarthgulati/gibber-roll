@@ -37,11 +37,27 @@
       <div slot="flyout" hidden>
         <div>
           <label for="reverbEl">Reverb</label>
-          <input type="number" step="0.1" min="0" max="100" value="0.5" id="reverbEl"/>
+          <input type="number" step="0.1" min="0" max="1" value="0" id="reverbEl"/>
+        </div>
+        <div>
+          <label for="instRevEl">I Rev</label>
+          <input type="number" step="0.1" min="0" max="1" value="0.5" id="instRevEl" />
+        </div>
+        <div>
+          <label for="drumRevEl">D Rev</label>
+          <input type="number" step="0.1" min="0" max="1" value="0" id="drumRevEl" />
         </div>
         <div>
           <label for="delayEl">Delay</label>
-          <input type="number" step="0.1" min="0" max="100" value="0" id="delayEl"/>
+          <input type="number" step="0.1" min="0" max="1" value="0" id="delayEl"/>
+        </div>
+        <div>
+          <label for="instDelayEl">I Delay</label>
+          <input type="number" step="0.1" min="0" max="1" value="0.5" id="instDelayEl" />
+        </div>
+        <div>
+          <label for="drumDelayEl">D Delay</label>
+          <input type="number" step="0.1" min="0" max="1" value="0" id="drumDelayEl"/>
         </div>
         <div>
           <label for="delayTimeEl">Delay Time</label>
@@ -97,7 +113,11 @@
     var octUp = document.querySelector('#octUp');
     var labelsEl = document.querySelector('aside');
     var reverbEl = document.querySelector('#reverbEl');
+    var drumRevEl = document.querySelector('#drumRevEl');
+    var instRevEl = document.querySelector('#instRevEl');
     var delayEl = document.querySelector('#delayEl');
+    var drumDelayEl = document.querySelector('#drumDelayEl');
+    var instrumentDelayEl = document.querySelector('#instDelayEl');
     var delayTimeEl = document.querySelector('#delayTimeEl');
 
     var keyboard = buildKeyboard(1, 7);
@@ -131,8 +151,12 @@
     var drumSequencer;
     var drums;
     var previewDrums;
-    var reverb;
-    var delay;
+    var reverb = 0;
+    var drumRev = 0;
+    var instrumentRev = 1;
+    var delay = 0;
+    var drumDelay = 0;
+    var instrumentDelay = 0.5;
     var delayTime;
   
     function updateColumns(idx, row, instrument, note) {
@@ -279,7 +303,8 @@
       updateDelay();
       updateDelayTime();
       drums = Drums();
-      drums.connect( reverb );
+      drums.connect( reverb, drumRev );
+      drums.connect( delay, drumDelay );
 
       previewDrums = Drums();
       
@@ -300,12 +325,10 @@
       }
       var preset = presetSelector.value === '' ? undefined : presetSelector.value;
       instrument = window[instrumentSelector.value](preset);
-      instrument.connect( reverb );
-      instrument.connect( delay );
+      instrument.connect( reverb, instrumentRev );
+      instrument.connect( delay, instrumentDelay );
 
       previewInstrument = window[instrumentSelector.value](preset);
-      previewInstrument.connect( reverb );
-      previewInstrument.connect( delay );
     }
 
     function clearGrid() {
@@ -386,6 +409,26 @@
       delay.gain = Number(delayEl.value);
     }
 
+    function updateInstrumentReverb() {
+      instrumentRev = Number(instRevEl.value)
+      instrument.connect(reverb, instrumentRev);
+    }
+
+    function updateDrumReverb() {
+      drumRev = Number(drumRevEl.value)
+      drums.connect(reverb, drumRev);
+    }
+
+    function updateInstrumentDelay() {
+      instrumentDelay = Number(instDelayEl.value)
+      instrument.connect(delay, instrumentDelay);
+    }
+
+    function updateDrumDelay() {
+      drumDelay = Number(drumDelayEl.value)
+      drums.connect(delay, drumDelay);
+    }
+
     function updateDelayTime() {
       delayFX.time = 1 / Number(delayTimeEl.value);
     }
@@ -404,7 +447,11 @@
     octUp.addEventListener('click', updateTranspose);
     octDown.addEventListener('click', updateTranspose);
     reverbEl.addEventListener('change', updateReverb);
+    drumRevEl.addEventListener('change', updateDrumReverb);
+    instRevEl.addEventListener('change', updateInstrumentReverb);
     delayEl.addEventListener('change', updateDelay);
+    drumDelayEl.addEventListener('change', updateDrumDelay);
+    instDelayEl.addEventListener('change', updateInstrumentDelay);
     delayTimeEl.addEventListener('change', updateDelayTime);
 
     updateTable();
