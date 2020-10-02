@@ -291,15 +291,19 @@
       var startIndex = keyboard.indexOf('C  4') + shift;
       var labels = keyboard.slice(startIndex, startIndex + Number(rowsEl.value));
       for(var i = 0; i < labels.length; i++) {
-        var labelEl = labelsEl.children[labelsEl.children.length - 5 - i];
-        console.log(360*((i-shift)%12)/12)
-        
-        document.querySelector(`table>tr:nth-of-type(${i+1})`).style.setProperty('--h', 360*((i-shift)%12)/12);
+        var index = (labelsEl.children.length - 1) - 4 - i;
+        var labelEl = labelsEl.children[index];
+        var row = table.children[index];
+        row.style.setProperty('--h', 360*((i-shift)%12)/12);
         labelEl.textContent = labels[i];
         if(labels[i].includes('#')) {
+          row.classList.add('black');
+          row.classList.remove('white');
           labelEl.classList.add('black');
           labelEl.classList.remove('white');
         } else {
+          row.classList.remove('black');
+          row.classList.add('white');
           labelEl.classList.remove('black');
           labelEl.classList.add('white');
         }

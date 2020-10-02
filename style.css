@@ -22,6 +22,8 @@ table {
   width: calc(100vw - var(--piano-width));
   width: -webkit-fill-available;
   height: -webkit-fill-available;
+  border-spacing: 0;
+  border-collapse: collapse;
 }
 tr {
   --s: 50%;
@@ -30,8 +32,11 @@ tr.drums {
   --s: 12%;
 }
 td {
-  border: 1px solid #efefef;
+  box-shadow: 0 0 1px 1px hsl(0, 0%, 99%) inset;
   padding: 0;
+}
+tr.black > td {
+  filter: brightness(92%);
 }
 td.light {
   background-color: hsl(var(--h), var(--s), 97.5%);
