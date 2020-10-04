@@ -318,7 +318,10 @@
     }
 
     function updateInstrument(e) {
-      stop();
+      var isPlaying = playPause.textContent !== '►';
+      if(isPlaying) {
+        stop();
+      }
       if(e.target === instrumentSelector) {
         updatePresets();
       }
@@ -328,6 +331,9 @@
       // instrument.connect( delay, instrumentDelay );
 
       previewInstrument = window[instrumentSelector.value](preset);
+      if(isPlaying) {
+        play();
+      }
     }
 
     function clearGrid() {
