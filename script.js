@@ -20,7 +20,7 @@ var instRevEl = document.querySelector('#instRevEl');
 var drumDelayEl = document.querySelector('#drumDelayEl');
 var instrumentDelayEl = document.querySelector('#instDelayEl');
 var delayTimeEl = document.querySelector('#delayTimeEl');
-
+var jsonUrl = JsonUrl('lzma');
 var keyboard = buildKeyboard(1, 7);
 
 function buildKeyboard(min, max) {
@@ -355,9 +355,12 @@ function save() {
   };
   
   var searchParams = new URLSearchParams(window.location.search);
-  searchParams.set('state', btoa(JSON.stringify(state)));
-  var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + searchParams.toString();
-  window.history.pushState({ path: newUrl }, '', newUrl);
+  // searchParams.set('state', btoa(JSON.stringify(state)));
+  jsonUrl.compress(state).then(stateParam => { 
+    searchParams.set('state', stateParam);
+    var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + searchParams.toString();
+    window.history.pushState({ path: newUrl }, '', newUrl);
+  });
 }
 
 function updateGridFromObj() {
@@ -386,10 +389,7 @@ function updateGridFromObj() {
   }
 }
 
-function load() {
-  var searchParams = new URLSearchParams(window.location.search);
-  if(!searchParams.has('state')) return;
-  var state = JSON.parse(atob(searchParams.get('state')));
+function loadState(state) {
   var keys = Object.keys(state);
   for(var i = 0; i < keys.length; i++) {
     var key = keys[i];
@@ -417,6 +417,12 @@ function load() {
   // starts playing some sound on setting value
   // updateDelayTime();
   updateGridFromObj();
+}
+
+function load() {
+  var searchParams = new URLSearchParams(window.location.search);
+  if(!searchParams.has('state')) return;
+  jsonUrl.decompress(searchParams.get('state')).then(loadState);
 }
 
 clearBtn.addEventListener('click', clearGrid);
