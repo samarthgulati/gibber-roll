@@ -12,11 +12,12 @@ var rowsEl = document.querySelector('#rowsEl');
 var transposeEl = document.querySelector('#transposeEl');
 var octDown = document.querySelector('#octDown');
 var octUp = document.querySelector('#octUp');
-var labelsEl = document.querySelector('aside');
-// var reverbEl = document.querySelector('#reverbEl');
+var synthLabelsEl = document.querySelector('#synthLabels');
+var drumLabelsEl = document.querySelector('#drumLabels');
+var reverbEl = document.querySelector('#reverbEl');
 var drumRevEl = document.querySelector('#drumRevEl');
 var instRevEl = document.querySelector('#instRevEl');
-// var delayEl = document.querySelector('#delayEl');
+var delayEl = document.querySelector('#delayEl');
 var drumDelayEl = document.querySelector('#drumDelayEl');
 var instrumentDelayEl = document.querySelector('#instDelayEl');
 var delayTimeEl = document.querySelector('#delayTimeEl');
@@ -72,17 +73,18 @@ function setupColumns(idx, row, instrument, note) {
 }
 
 function setupTable() {
-  labelsEl.innerHTML = '';
+  synthLabelsEl.innerHTML = '';
+  drumLabelsEl.innerHTML = '';
   table.innerHTML = '';
   columns = columnsEl.value;
   rows = rowsEl.value;
-  table.style.setProperty('--rows', rows);
+  document.body.style.setProperty('--rows', rows);
   for(var r = 0; r < rows; r++) {
     var note = (rows-r-1) * incBy;
     notes.push(note);
     steps[note] = document.createElement('tr');
     table.appendChild(steps[note]);
-    labelsEl.appendChild(document.createElement('span'));
+    synthLabelsEl.appendChild(document.createElement('span'));
     setupColumns(r, steps[note], 'synth', note);
   }
 
@@ -95,7 +97,7 @@ function setupTable() {
     var label = document.createElement('span');
     label.textContent = note;
     label.classList.add('drums');
-    labelsEl.appendChild(label);
+    drumLabelsEl.appendChild(label);
     setupColumns(d, drumSteps[note], 'drums', note);
   }
   updateLabels();
@@ -199,12 +201,12 @@ function setup() {
   delayFX = Delay({ time: 1 / 6, feedback: .75 });
   delay = Bus2().fx.add( delayFX );
   updateInstrument({target: instrumentEl});
-  // updateReverb();
-  // updateDelay();
+  updateReverb();
+  updateDelay();
   updateDelayTime();
   drums = Drums();
-  // drums.connect( reverb, drumRev );
-  // drums.connect( delay, drumDelay );
+  drums.connect( reverb, Number(drumRevEl.value) );
+  drums.connect( delay, Number(drumDelayEl.value) );
 
   previewDrums = Drums();
   hideOverlay();
@@ -236,8 +238,8 @@ function updateInstrument(e) {
   }
   var preset = presetEl.value === '' ? undefined : presetEl.value;
   instrument = window[instrumentEl.value](preset);
-  // instrument.connect( reverb, instrumentRev );
-  // instrument.connect( delay, instrumentDelay );
+  instrument.connect( reverb, Number(instRevEl.value) );
+  instrument.connect( delay, Number(instDelayEl.value) );
 
   previewInstrument = window[instrumentEl.value](preset);
   if(isPlaying) {
@@ -286,8 +288,8 @@ function updateLabels() {
   var startIndex = keyboard.indexOf('C  4') + shift;
   var labels = keyboard.slice(startIndex, startIndex + Number(rowsEl.value));
   for(var i = 0; i < labels.length; i++) {
-    var index = (labelsEl.children.length - 1) - 4 - i;
-    var labelEl = labelsEl.children[index];
+    var index = (synthLabelsEl.children.length - 1) - i;
+    var labelEl = synthLabelsEl.children[index];
     var row = table.children[index];
     row.style.setProperty('--h', 360*((i-shift)%12)/12);
     labelEl.textContent = labels[i];
@@ -324,13 +326,13 @@ function updateTranspose(e) {
   }
 }
 
-// function updateReverb() {
-//   reverb.gain = Number(reverbEl.value);
-// }
+function updateReverb() {
+  reverb.gain = Number(reverbEl.value);
+}
 
-// function updateDelay() {
-//   delay.gain = Number(delayEl.value);
-// }
+function updateDelay() {
+  delay.gain = Number(delayEl.value);
+}
 
 function updateInstrumentReverb() {
   instrument.connect(reverb, Number(instRevEl.value));
@@ -360,6 +362,8 @@ function save() {
     instrumentEl: instrumentEl.value,
     presetEl: presetEl.value,
     stepsObj: stepsObj,
+    reverbEl: reverbEl.value,
+    delayEl: delayEl.value,
     drumStepsObj: drumStepsObj,
     drumRevEl: drumRevEl.value,
     instRevEl: instRevEl.value,
@@ -434,6 +438,8 @@ function loadState(state) {
   updateInstrumentReverb();
   updateDrumDelay();
   updateInstrumentDelay();
+  updateReverb();
+  updateDelay();
   // starts playing some sound on setting value
   // updateDelayTime();
   updateGridFromObj();
@@ -500,7 +506,7 @@ function updateRows() {
       notes.unshift(note);
       steps[note] = document.createElement('tr');
       table.insertBefore(steps[note], table.firstElementChild);
-      labelsEl.insertBefore(document.createElement('span'), labelsEl.firstElementChild);
+      synthLabelsEl.insertBefore(document.createElement('span'), synthLabelsEl.firstElementChild);
       setupColumns(i, steps[note], 'synth', note);
     }
     updateLabels();
@@ -509,10 +515,10 @@ function updateRows() {
       var note = notes.shift();
       delete steps[note];
       table.removeChild(table.children[0]);
-      labelsEl.removeChild(labelsEl.children[0]);
+      synthLabelsEl.removeChild(synthLabelsEl.children[0]);
     }
   }
-  table.style.setProperty('--rows', rows);
+  document.body.style.setProperty('--rows', rows);
   if(isPlaying) {
     play();
   }
@@ -532,10 +538,10 @@ table.addEventListener('click', handleTableClick);
 transposeEl.addEventListener('change', updateTranspose);
 octUp.addEventListener('click', updateTranspose);
 octDown.addEventListener('click', updateTranspose);
-// reverbEl.addEventListener('change', updateReverb);
+reverbEl.addEventListener('change', updateReverb);
 drumRevEl.addEventListener('change', updateDrumReverb);
 instRevEl.addEventListener('change', updateInstrumentReverb);
-// delayEl.addEventListener('change', updateDelay);
+delayEl.addEventListener('change', updateDelay);
 drumDelayEl.addEventListener('change', updateDrumDelay);
 instDelayEl.addEventListener('change', updateInstrumentDelay);
 delayTimeEl.addEventListener('change', updateDelayTime);

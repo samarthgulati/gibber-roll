@@ -5,7 +5,7 @@ html, body {
   display: flex;
   flex-direction: column;
   font-family: monospace;
-  --piano-width: 5rem;
+  --piano-width: 6.75rem;
 }
 section {
   display: flex;
@@ -15,6 +15,78 @@ section {
 aside {
   width: var(--piano-width);  
   white-space: pre;
+}
+
+aside > article {
+  display: flex;
+  box-shadow: 0 0 0 1px black;
+}
+aside > article:first-of-type {
+  height: calc((var(--rows) * (100vh - 5rem))/(var(--rows) + 4));
+}
+aside > article:last-of-type {
+  height: calc((4 * (100vh - 5rem))/(var(--rows) + 4));
+}
+aside > article > label {
+  display: flex;
+  flex-direction: column-reverse;
+  width: 1.5rem;
+  justify-content: space-between;
+  padding-right: 0.5rem;
+  /* margin-right: 0.25rem; */
+  border-right: 1px solid black;
+}
+aside > article > label > h5 {
+  transform: rotate(-90deg) translateX(10px);
+  font-size: 1.25rem;
+  margin: 0;
+  padding: 0;
+  /* background: #efefef; */
+}
+aside > article > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 100%;
+}
+aside fly-out {
+  height: 2rem;
+}
+aside fly-out > button {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  width: 1.25rem;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  margin-left: -1.25rem;
+  position: absolute;
+  top: 0;
+}
+aside fly-out > div[slot="flyout"] {
+  left: 2rem;
+  /* display: flex; */
+  flex-direction: row;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  height: 2.75rem;
+}
+aside fly-out > div[slot="flyout"] > div {
+  padding: 0.25rem 0.5rem;
+  border-bottom: none !important;
+  border-right: 1px solid #efefef;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+}
+aside fly-out > div > div > label {
+  margin-right: 0.25rem;
+  margin-left: 0.25rem;
+}
+aside fly-out > div > div > input {
+  margin-right: 0.5rem;
 }
 table {
   flex: 1;
@@ -48,18 +120,18 @@ aside {
   display: flex;
   flex-direction: column;
 }
-aside > span {
+aside span {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   padding-left: 1rem;
 }
-aside > span.black {
+aside span.black {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%'><rect fill='black' x='0%' y='12.5%' width='75%' height='75%'/><line x1='75%' x2='100%' y1='50%' y2='50%' stroke='black'></line></svg>");
   color: white;
 }
-aside > span.white {
+aside span.white {
   color: black;
 }
 
@@ -67,15 +139,11 @@ span.white + span.white {
   border-top: 1px solid black;
 }
 
-aside > span.drums {
+aside span.drums {
   justify-content: flex-start;
   text-transform: uppercase;
   border-top: 1px solid black;
-}    
-
-aside > span:last-of-type {
-  border-bottom: 1px solid black;
-}
+} 
 
 nav {
   margin: 0;
