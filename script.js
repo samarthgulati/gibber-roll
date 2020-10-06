@@ -194,7 +194,7 @@ function togglePlayPause() {
   }
 }
 
-function hideOverlay() {
+function setup() {
   reverb = Bus2().fx.add( Freeverb() );
   delayFX = Delay({ time: 1 / 6, feedback: .75 });
   delay = Bus2().fx.add( delayFX );
@@ -207,16 +207,23 @@ function hideOverlay() {
   // drums.connect( delay, drumDelay );
 
   previewDrums = Drums();
-  
-  document.querySelector('#overlay').style.display = 'none';
+  hideOverlay();
   load();
+}
+
+function hideOverlay() {
+  document.querySelector('#overlay').style.display = 'none';
+}
+
+function showOverlay() {
+  document.querySelector('#overlay').style.display = 'flex';
 }
 
 function loadGibber() {
   loadBtn.disabled = true;
   loadBtn.textContent = 'Loading...';
   Gibber.init()
-  .then(hideOverlay);
+  .then(setup);
 }
 
 function updateInstrument(e) {
@@ -346,6 +353,8 @@ function updateDelayTime() {
 }
 
 function save() {
+  loadBtn.textContent = 'Saving...';
+  showOverlay();
   updateSequence();
   var state = {
     instrumentEl: instrumentEl.value,
@@ -369,6 +378,7 @@ function save() {
     searchParams.set('state', stateParam);
     var newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?" + searchParams.toString();
     window.history.pushState({ path: newUrl }, '', newUrl);
+    hideOverlay();
   });
 }
 
@@ -427,9 +437,12 @@ function loadState(state) {
   // starts playing some sound on setting value
   // updateDelayTime();
   updateGridFromObj();
+  hideOverlay();
 }
 
 function load() {
+  loadBtn.textContent = 'Loading...';
+  showOverlay();
   var searchParams = new URLSearchParams(window.location.search);
   if(!searchParams.has('state')) return;
   jsonUrl.decompress(searchParams.get('state')).then(loadState);
