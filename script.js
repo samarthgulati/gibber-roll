@@ -429,8 +429,7 @@ function updateColumns() {
   }
   var currCount = document.querySelectorAll('tr:first-of-type > td').length;
   var newCount = Number(columnsEl.value);
-  
-  // var rows = document.querySelectorAll('tr:not(.drums)');
+  if(newCount === currCount) return;
   var rows = document.querySelectorAll('tr');
   for(var i = 0; i < rows.length; i++) {
     var row = rows[i];
@@ -445,11 +444,46 @@ function updateColumns() {
         row.appendChild(cell);
       }
     } else {
-      for(var j = row.children.length - 1; j >= newCount; j--) {
+      for(var j = currCount - 1; j >= newCount; j--) {
         row.removeChild(row.children[j]);
       }
     }
   }
+  columns = columnsEl.value;
+  if(isPlaying) {
+    play();
+  }
+}
+
+function updateRows() {
+  var isPlaying = playPause.textContent !== '►';
+  if(isPlaying) {
+    stop();
+  }
+  var currCount = document.querySelectorAll('tr:not(.drums)').length;
+  var newCount = Number(rowsEl.value);
+  
+  rows = newCount;
+  if(newCount === currCount) return;
+  if(newCount > currCount) {
+    for(var i = newCount - currCount - 1; i >= 0 ; i--) {
+      var note = (rows-i-1) * incBy;
+      notes.unshift(note);
+      steps[note] = document.createElement('tr');
+      table.insertBefore(steps[note], table.firstElementChild);
+      labelsEl.insertBefore(document.createElement('span'), labelsEl.firstElementChild);
+      setupColumns(i, steps[note], 'synth', note);
+    }
+    updateLabels();
+  } else {
+    for(var j = 0; j < currCount - newCount; j++) {
+      var note = notes.shift();
+      delete steps[note];
+      table.removeChild(table.children[0]);
+      labelsEl.removeChild(labelsEl.children[0]);
+    }
+  }
+  table.style.setProperty('--rows', rows);
   if(isPlaying) {
     play();
   }
@@ -464,7 +498,7 @@ presetEl.addEventListener('change', updateInstrument);
 bpmSlider.addEventListener('input', updateBpmSlider);
 bpmEl.addEventListener('change', updateBpmInput);
 columnsEl.addEventListener('change', updateColumns);
-// rowsEl.addEventListener('change', updateRows);
+rowsEl.addEventListener('change', updateRows);
 table.addEventListener('click', handleTableClick);
 transposeEl.addEventListener('change', updateTranspose);
 octUp.addEventListener('click', updateTranspose);
