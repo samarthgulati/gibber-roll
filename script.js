@@ -390,6 +390,7 @@ function loadState(state) {
   var keys = Object.keys(state);
   for(var i = 0; i < keys.length; i++) {
     var key = keys[i];
+    if(!window[key]) return;
     if(key.endsWith('El')) {
       window[key].value = state[key];
     } else if(key.endsWith('Obj')) {
