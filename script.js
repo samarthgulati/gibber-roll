@@ -60,7 +60,7 @@ var delay;
 // var instrumentDelay = 0.5;
 var delayTime;
 
-function updateColumns(idx, row, instrument, note) {
+function setupColumns(idx, row, instrument, note) {
   for (var c = 0; c < columns; c++) {
     var cell = document.createElement('td');
     cell.dataset.note = note;
@@ -71,10 +71,7 @@ function updateColumns(idx, row, instrument, note) {
   }
 }
 
-function updateTable() {
-  if(playPause.textContent !== '►') {
-    stop();
-  }
+function setupTable() {
   labelsEl.innerHTML = '';
   table.innerHTML = '';
   columns = columnsEl.value;
@@ -86,7 +83,7 @@ function updateTable() {
     steps[note] = document.createElement('tr');
     table.appendChild(steps[note]);
     labelsEl.appendChild(document.createElement('span'));
-    updateColumns(r, steps[note], 'synth', note);
+    setupColumns(r, steps[note], 'synth', note);
   }
 
   for(var d = 0; d < drumNotes.length; d++) {
@@ -99,7 +96,7 @@ function updateTable() {
     label.textContent = note;
     label.classList.add('drums');
     labelsEl.appendChild(label);
-    updateColumns(d, drumSteps[note], 'drums', note);
+    setupColumns(d, drumSteps[note], 'drums', note);
   }
   updateLabels();
 }
@@ -399,7 +396,7 @@ function loadState(state) {
       window[key] = state[key];
     }
   }
-  updateTable();
+  setupTable();
   updateInstrument({target: instrumentEl});
   presetEl.value = state.presetEl;
   // throws error regarding delay for some presets
@@ -425,6 +422,39 @@ function load() {
   jsonUrl.decompress(searchParams.get('state')).then(loadState);
 }
 
+function updateColumns() {
+  var isPlaying = playPause.textContent !== '►';
+  if(isPlaying) {
+    stop();
+  }
+  var currCount = document.querySelectorAll('tr:first-of-type > td').length;
+  var newCount = Number(columnsEl.value);
+  
+  // var rows = document.querySelectorAll('tr:not(.drums)');
+  var rows = document.querySelectorAll('tr');
+  for(var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var dataset = rows[i].firstElementChild.dataset;
+    if(newCount > currCount) {
+      for(var j = 0; j < newCount - currCount; j++) {
+        var cell = document.createElement('td');
+        cell.style.setProperty('--row', i);
+        cell.classList.add(Math.floor(0.25*j) % 2 ? 'light' : 'dark');
+        cell.dataset.note = dataset.note;
+        cell.dataset.instrument = dataset.instrument;
+        row.appendChild(cell);
+      }
+    } else {
+      for(var j = row.children.length - 1; j >= newCount; j--) {
+        row.removeChild(row.children[j]);
+      }
+    }
+  }
+  if(isPlaying) {
+    play();
+  }
+}
+
 clearBtn.addEventListener('click', clearGrid);
 saveBtn.addEventListener('click', save);
 loadBtn.addEventListener('click', loadGibber);
@@ -433,8 +463,8 @@ instrumentEl.addEventListener('change', updateInstrument);
 presetEl.addEventListener('change', updateInstrument);
 bpmSlider.addEventListener('input', updateBpmSlider);
 bpmEl.addEventListener('change', updateBpmInput);
-columnsEl.addEventListener('change', updateTable);
-rowsEl.addEventListener('change', updateTable);
+columnsEl.addEventListener('change', updateColumns);
+// rowsEl.addEventListener('change', updateRows);
 table.addEventListener('click', handleTableClick);
 transposeEl.addEventListener('change', updateTranspose);
 octUp.addEventListener('click', updateTranspose);
@@ -447,4 +477,4 @@ drumDelayEl.addEventListener('change', updateDrumDelay);
 instDelayEl.addEventListener('change', updateInstrumentDelay);
 delayTimeEl.addEventListener('change', updateDelayTime);
 
-updateTable();
+setupTable();
