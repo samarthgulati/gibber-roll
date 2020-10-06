@@ -444,7 +444,10 @@ function load() {
   loadBtn.textContent = 'Loading...';
   showOverlay();
   var searchParams = new URLSearchParams(window.location.search);
-  if(!searchParams.has('state')) return;
+  if(!searchParams.has('state')) {
+    hideOverlay();
+    return;
+  }
   jsonUrl.decompress(searchParams.get('state')).then(loadState);
 }
 
