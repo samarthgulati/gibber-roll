@@ -112,14 +112,17 @@ function playNote(instr, note) {
 }
 
 function handleTableClick(e) {
+  var isPlaying = playPause.textContent !== '►';
+  if(isPlaying) {
+    stop();
+  }
   var td = e.composedPath()[0];
   if(td.tagName !== 'TD') return;
   td.classList.toggle('on');
   if(td.classList.contains('on')) {
     playNote(td.dataset.instrument, td.dataset.note);
   }
-  if(playPause.textContent !== '►') {
-    stop();
+  if(isPlaying) {
     play();
   }
 }
@@ -240,7 +243,10 @@ function clearGrid() {
   for(var i = 0; i < onCells.length; i++) {
     onCells[i].classList.remove('on');
   }
-  togglePlayPause();
+  var isPlaying = playPause.textContent !== '►';
+  if(isPlaying) {
+    stop();
+  }
 }
 
 function updateBpm() {
@@ -293,7 +299,10 @@ function updateLabels() {
 }
 
 function updateTranspose(e) {
-  stop();
+  var isPlaying = playPause.textContent !== '►';
+  if(isPlaying) {
+    stop();
+  }
   var delta = e.target.tagName === 'BUTTON' ? Number(e.target.textContent) : 0;
   transposeEl.value = Math.max(
     Number(transposeEl.min), 
@@ -303,6 +312,9 @@ function updateTranspose(e) {
     )
   );
   updateLabels();
+  if(isPlaying) {
+    play();
+  }
 }
 
 // function updateReverb() {
