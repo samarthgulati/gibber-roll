@@ -88,14 +88,6 @@
         </div>
       </div>
     </fly-out>
-    <button id="playPause">&#9658;</button>
-    <div>
-      <label for="bpmEl">Beats per min.</label>
-      <span>
-        <input type="range" step="1" min="1" max="400" value="120" id="bpmSlider"/>
-        <input type="number" step="1" min="1" max="400" value="120" id="bpmEl"/>
-      </span>
-    </div>
     <fly-out>
       <button slot="label">Settings</button>
       <div slot="flyout" hidden>
@@ -117,7 +109,16 @@
         </div>
       </div>
     </fly-out>
+    <button id="playPause">&#9658;</button>
+    <div>
+      <label for="bpmEl">Beats per min.</label>
+      <span>
+        <input type="range" step="1" min="1" max="400" value="120" id="bpmSlider"/>
+        <input type="number" step="1" min="1" max="400" value="120" id="bpmEl"/>
+      </span>
+    </div>
     <button id="save">Save</button>
+    <button id="code">Copy Code</button>
     <button id="clear">Clear</button>
   </nav>
   <script src="lib/fly-out.js"></script>

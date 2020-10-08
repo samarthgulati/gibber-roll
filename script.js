@@ -1,4 +1,5 @@
 var table = document.querySelector('table');
+var codeBtn = document.querySelector('#code');
 var loadBtn = document.querySelector('#load');
 var clearBtn = document.querySelector('#clear');
 var saveBtn = document.querySelector('#save');
@@ -19,7 +20,7 @@ var drumRevEl = document.querySelector('#drumRevEl');
 var instRevEl = document.querySelector('#instRevEl');
 var delayEl = document.querySelector('#delayEl');
 var drumDelayEl = document.querySelector('#drumDelayEl');
-var instrumentDelayEl = document.querySelector('#instDelayEl');
+var instDelayEl = document.querySelector('#instDelayEl');
 var delayTimeEl = document.querySelector('#delayTimeEl');
 var jsonUrl = JsonUrl('lzma');
 var keyboard = buildKeyboard(1, 7);
@@ -524,6 +525,57 @@ function updateRows() {
   }
 }
 
+function getCode() {
+  updateSequence();
+  var preset = presetEl.value === '' ? undefined : presetEl.value;
+  return `
+Clock.bpm = ${bpmEl.value};
+reverb = Bus2().fx.add( Freeverb() );
+delayFX = Delay({ time: 1 / 6, feedback: .75 });
+delay = Bus2().fx.add( delayFX );
+instrument = ${instrumentEl.value}(${preset});
+drums = Drums();
+reverb.gain = ${reverbEl.value};
+delay.gain = ${delayEl.value};
+delayFX.time = 1 / ${delayTimeEl.value};
+instrument.connect(reverb, ${instRevEl.value});
+drums.connect(reverb, ${drumRevEl.value});
+instrument.connect(delay, ${instDelayEl.value});
+drums.connect(delay, ${drumDelayEl.value});
+sequencer = Gibber.Steps(${JSON.stringify(transposedSteps())}, instrument);
+drumSequencer = Gibber.Steps(${JSON.stringify(drumStepsObj)}, drums);`;
+}
+
+function toggleCodeModal() {
+  var textArea = document.createElement("textarea");
+  textArea.value = getCode();
+  
+  // Avoid scrolling to bottom
+  textArea.style.top = "0";
+  textArea.style.left = "0";
+  textArea.style.position = "fixed";
+
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  try {
+		var successful = document.execCommand('copy');
+    if(successful) {
+			codeBtn.textContent = 'Copied';
+			codeBtn.setAttribute('disabled', true);
+			setTimeout(function() {
+				codeBtn.textContent = 'Copy Code';
+				codeBtn.removeAttribute('disabled');
+			}, 500);
+		}
+  } catch (err) {
+    console.error('Fallback: Oops, unable to copy', err);
+  }
+
+  document.body.removeChild(textArea);
+}
+
 clearBtn.addEventListener('click', clearGrid);
 saveBtn.addEventListener('click', save);
 loadBtn.addEventListener('click', loadGibber);
@@ -545,5 +597,6 @@ delayEl.addEventListener('change', updateDelay);
 drumDelayEl.addEventListener('change', updateDrumDelay);
 instDelayEl.addEventListener('change', updateInstrumentDelay);
 delayTimeEl.addEventListener('change', updateDelayTime);
+codeBtn.addEventListener('click', toggleCodeModal);
 
 setupTable();
