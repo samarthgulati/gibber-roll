@@ -477,7 +477,7 @@ function updateColumns() {
       for(var j = 0; j < newCount - currCount; j++) {
         var cell = document.createElement('td');
         cell.style.setProperty('--row', i);
-        cell.classList.add(Math.floor(0.25*j) % 2 ? 'light' : 'dark');
+        cell.classList.add(Math.floor(0.25*(currCount + j)) % 2 ? 'light' : 'dark');
         cell.dataset.note = dataset.note;
         cell.dataset.instrument = dataset.instrument;
         row.appendChild(cell);
