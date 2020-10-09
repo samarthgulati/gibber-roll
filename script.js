@@ -529,6 +529,17 @@ function updateRows() {
 
 function getCode() {
   updateSequence();
+  var transposedStepsObj = transposedSteps()
+  for (var key in transposedStepsObj) {
+    if (transposedStepsObj[key].indexOf('x') < 0) {
+      delete transposedStepsObj[key]
+    }
+  }
+  for (var key in drumStepsObj) {
+    if (transposedStepsObj[key].indexOf('x') < 0) {
+      delete transposedStepsObj[key]
+    }
+  }
   var preset = presetEl.value === '' ? undefined : presetEl.value;
   return `
 Clock.bpm = ${bpmEl.value};
@@ -544,7 +555,7 @@ instrument.connect(reverb, ${instRevEl.value});
 drums.connect(reverb, ${drumRevEl.value});
 instrument.connect(delay, ${instDelayEl.value});
 drums.connect(delay, ${drumDelayEl.value});
-sequencer = Gibber.Steps(${JSON.stringify(transposedSteps())}, instrument);
+sequencer = Gibber.Steps(${JSON.stringify(transposedStepsObj)}, instrument);
 drumSequencer = Gibber.Steps(${JSON.stringify(drumStepsObj)}, drums);`;
 }
 
