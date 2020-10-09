@@ -533,7 +533,7 @@ function getCode() {
       delete transposedStepsObj[key]
     }
   }
-  for (var key in transposedStepsObj) {
+  for (var key in drumStepsObj) {
     if (transposedStepsObj[key].indexOf('x') < 0) {
       delete transposedStepsObj[key]
     }
