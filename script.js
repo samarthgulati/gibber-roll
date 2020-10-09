@@ -238,10 +238,12 @@ function updateInstrument(e) {
     updatePresets();
   }
   var preset = presetEl.value === '' ? undefined : presetEl.value;
+  if (instrument != undefined) instrument.clear();
   instrument = window[instrumentEl.value](preset);
   instrument.connect( reverb, Number(instRevEl.value) );
   instrument.connect( delay, Number(instDelayEl.value) );
 
+  if (previewInstrument != undefined) previewInstrument.clear();
   previewInstrument = window[instrumentEl.value](preset);
   if(isPlaying) {
     play();
