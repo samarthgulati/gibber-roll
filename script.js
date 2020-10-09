@@ -38,6 +38,7 @@ function buildKeyboard(min, max) {
 
 var columns = 16;
 var rows = 16;
+var bpmMult = 1;
 
 var incBy = 1;
 
@@ -262,7 +263,7 @@ function clearGrid() {
 }
 
 function updateBpm() {
-  Clock.bpm = bpmEl.value;
+  Clock.bpm = bpmEl.value * bpmMult;
 }
 
 function updateBpmInput() {
@@ -488,6 +489,8 @@ function updateColumns() {
     }
   }
   columns = columnsEl.value;
+  bpmMult = (16 / columnsEl.value);
+  Clock.bpm = bpmEl.value * bpmMult;
   if(isPlaying) {
     play();
   }
@@ -542,7 +545,7 @@ function getCode() {
   }
   var preset = presetEl.value === '' ? undefined : presetEl.value;
   return `
-Clock.bpm = ${bpmEl.value};
+Clock.bpm = ${bpmEl.value * bpmMult};
 reverb = Bus2().fx.add( Freeverb() );
 delayFX = Delay({ time: 1 / 6, feedback: .75 });
 delay = Bus2().fx.add( delayFX );
