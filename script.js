@@ -38,8 +38,6 @@ function buildKeyboard(min, max) {
   return keyboard;
 }
 
-var columns = 16;
-var rows = 16;
 var bpmMult = 1;
 
 var incBy = 1;
@@ -66,6 +64,7 @@ var delay;
 var delayTime;
 
 function setupColumns(idx, row, instrument, note) {
+  var columns = Number(columnsEl.value);
   for (var c = 0; c < columns; c++) {
     var cell = document.createElement('td');
     cell.dataset.note = note;
@@ -80,12 +79,11 @@ function setupTable() {
   synthLabelsEl.innerHTML = '';
   drumLabelsEl.innerHTML = '';
   table.innerHTML = '';
-  columns = columnsEl.value;
-  rows = rowsEl.value;
-  bpmMult = 16 / columns;
+  var rows = Number(rowsEl.value);
+  bpmMult = 16 / Number(columnsEl.value);
   document.body.style.setProperty('--rows', rows);
   for(var r = 0; r < rows; r++) {
-    var note = (rows-r-1) * incBy;
+    var note = (rows - r - 1) * incBy;
     notes.push(note);
     steps[note] = document.createElement('tr');
     table.appendChild(steps[note]);
@@ -509,7 +507,7 @@ function updateColumns() {
       }
     }
   }
-  bpmMult = 16 / columnsEl.value;
+  bpmMult = 16 / Number(columnsEl.value);
   updateBpm();
   if(isPlaying) {
     play();
@@ -524,11 +522,10 @@ function updateRows() {
   var currCount = document.querySelectorAll('tr:not(.drums)').length;
   var newCount = Number(rowsEl.value);
   
-  rows = newCount;
   if(newCount === currCount) return;
   if(newCount > currCount) {
     for(var i = newCount - currCount - 1; i >= 0 ; i--) {
-      var note = (rows-i-1) * incBy;
+      var note = (newCount - i - 1) * incBy;
       notes.unshift(note);
       steps[note] = document.createElement('tr');
       table.insertBefore(steps[note], table.firstElementChild);
@@ -544,7 +541,7 @@ function updateRows() {
       synthLabelsEl.removeChild(synthLabelsEl.children[0]);
     }
   }
-  document.body.style.setProperty('--rows', rows);
+  document.body.style.setProperty('--rows', newCount);
   if(isPlaying) {
     play();
   }
@@ -619,6 +616,23 @@ function getRandomState(states) {
   return Object.assign({}, states[key]);
 }
 
+function matchNotesToColumnCount(stepsObj, columns) {
+  var notes = Object.keys(stepsObj);
+  if(notes.length === 0) return stepsObj;
+  var remixColumns = stepsObj[notes[0]].length;
+  if(remixColumns === columns) return stepsObj;
+  for(var i = 0; i < notes.length; i++) {
+    var steps = stepsObj[notes[i]];
+    if(remixColumns < columns) {
+      for(var j = 0; j < Math.ceil(columns/remixColumns); j++) {
+        steps = steps.concat(steps);
+      }
+    }
+    stepsObj[notes[i]] = steps.substring(0, columns);
+  }
+  return stepsObj;
+}
+
 function remixInst() {
   var isPlaying = playPause.textContent !== '►';
   if(isPlaying) {
@@ -638,6 +652,7 @@ function remixInst() {
   state['transposeEl'] = min;
   state['rowsEl'] = Math.max(range, 16);
   state['columnsEl'] = state.stepsObj[notes[0]].length;
+  state.drumStepsObj = matchNotesToColumnCount(drumStepsObj, state['columnsEl']);
   loadState(state);
   if(isPlaying) {
     play();
@@ -650,8 +665,7 @@ function remixDrums() {
     stop();
   }
   var state = getRandomState(drumBeats);
-  var notes = Object.keys(state.drumStepsObj);
-  state['columnsEl'] = state.drumStepsObj[notes[0]].length;
+  state.drumStepsObj = matchNotesToColumnCount(state.drumStepsObj, Number(columnsEl.value));
   loadState(state);
   if(isPlaying) {
     play();
