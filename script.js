@@ -550,13 +550,12 @@ function getCode() {
       delete drumStepsObjCopy[key];
     }
   }
-  var preset = presetEl.value === '' ? undefined : presetEl.value;
   return `
 Clock.bpm = ${bpmEl.value * bpmMult};
 reverb = Bus2().fx.add( Freeverb() );
 delayFX = Delay({ time: 1 / 6, feedback: .75 });
 delay = Bus2().fx.add( delayFX );
-instrument = ${instrumentEl.value}(${preset});
+instrument = ${instrumentEl.value}(${presetEl.value});
 drums = Drums();
 reverb.gain = ${reverbEl.value};
 delay.gain = ${delayEl.value};
