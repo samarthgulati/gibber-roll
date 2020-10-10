@@ -563,7 +563,7 @@ sequencer = Gibber.Steps(${JSON.stringify(transposedStepsObj)}, instrument);
 drumSequencer = Gibber.Steps(${JSON.stringify(drumStepsObjCopy)}, drums);`;
 }
 
-function toggleCodeModal() {
+function copyCodeToClipboard() {
   var textArea = document.createElement("textarea");
   textArea.value = getCode();
   
@@ -614,6 +614,6 @@ delayEl.addEventListener('change', updateDelay);
 drumDelayEl.addEventListener('change', updateDrumDelay);
 instDelayEl.addEventListener('change', updateInstrumentDelay);
 delayTimeEl.addEventListener('change', updateDelayTime);
-codeBtn.addEventListener('click', toggleCodeModal);
+codeBtn.addEventListener('click', copyCodeToClipboard);
 
 setupTable();
