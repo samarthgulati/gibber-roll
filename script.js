@@ -367,13 +367,25 @@ function save() {
   loadBtn.textContent = 'Saving...';
   showOverlay();
   updateSequence();
+  var stepsObjCopy = Object.assign({}, stepsObj);
+  for (var key in stepsObjCopy) {
+    if (stepsObjCopy[key].indexOf('x') < 0) {
+      delete stepsObjCopy[key];
+    }
+  }
+  var drumStepsObjCopy = Object.assign({}, drumStepsObj);
+  for (var key in drumStepsObjCopy) {
+    if (drumStepsObjCopy[key].indexOf('x') < 0) {
+      delete drumStepsObjCopy[key];
+    }
+  }
   var state = {
     instrumentEl: instrumentEl.value,
     presetEl: presetEl.value,
-    stepsObj: stepsObj,
+    stepsObj: stepsObjCopy,
     reverbEl: reverbEl.value,
     delayEl: delayEl.value,
-    drumStepsObj: drumStepsObj,
+    drumStepsObj: drumStepsObjCopy,
     drumRevEl: drumRevEl.value,
     instRevEl: instRevEl.value,
     drumDelayEl: drumDelayEl.value,
@@ -611,7 +623,6 @@ function remixInst() {
     stop();
   }
   var state = getRandomState(melodies);
-  console.log(state);
   
   var notes = Object.keys(state.stepsObj);
   var min = Infinity;
