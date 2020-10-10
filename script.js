@@ -447,13 +447,15 @@ function loadState(state) {
     } 
   }
   setupTable();
-  updateInstrument({target: instrumentEl});
-  presetEl.value = state.presetEl;
-  // throws error regarding delay for some presets
-  try {
-    updateInstrument({target: ''});
-  } catch(e) {
-    console.error(e);
+  if('presetEl' in state) {
+    updateInstrument({target: instrumentEl});
+    presetEl.value = state.presetEl;
+    // throws error regarding delay for some presets
+    try {
+      updateInstrument({target: ''});
+    } catch(e) {
+      console.error(e);
+    }
   }
   updateBpmInput();
   updateTranspose({target: { tagName : ''}});
