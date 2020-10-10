@@ -110,6 +110,7 @@ tr.drums {
 td {
   box-shadow: 0 0 1px 1px hsl(0, 0%, 99%) inset;
   padding: 0;
+  transition: background-color 300ms ease-in-out;
 }
 tr.black > td {
   filter: brightness(92%);
@@ -120,6 +121,21 @@ td.light {
 td.dark {
   background-color: hsl(var(--h), var(--s), 95.5%);
 }
+
+td.light:hover {
+  background-color: hsl(var(--h), var(--s), 47.5%);
+}
+td.dark:hover {
+  background-color: hsl(var(--h), var(--s), 45.5%);
+}
+
+td.light:active {
+  background-color: hsl(var(--h), var(--s), 37.5%);
+}
+td.dark:active {
+  background-color: hsl(var(--h), var(--s), 35.5%);
+}
+
 aside {
   display: flex;
   flex-direction: column;
@@ -188,6 +204,12 @@ div[slot="flyout"] > div:last-of-type {
 
 td.on {
   background: hsl(var(--h), var(--s), 50%);
+}
+td.on.light:hover {
+  background-color: hsl(var(--h), var(--s), 67.5%);
+}
+td.on.dark:hover {
+  background-color: hsl(var(--h), var(--s), 65.5%);
 }
 #playPause {
   background-image: none;
