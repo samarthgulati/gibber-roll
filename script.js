@@ -82,6 +82,7 @@ function setupTable() {
   table.innerHTML = '';
   columns = columnsEl.value;
   rows = rowsEl.value;
+  bpmMult = 16 / columns;
   document.body.style.setProperty('--rows', rows);
   for(var r = 0; r < rows; r++) {
     var note = (rows-r-1) * incBy;
@@ -431,9 +432,7 @@ function loadState(state) {
       window[key].value = state[key];
     } else if(key.endsWith('Obj')) {
       window[key] = state[key];
-    } else {
-      window[key] = state[key];
-    }
+    } 
   }
   setupTable();
   updateInstrument({target: instrumentEl});
@@ -496,9 +495,8 @@ function updateColumns() {
       }
     }
   }
-  columns = columnsEl.value;
-  bpmMult = (16 / columnsEl.value);
-  Clock.bpm = bpmEl.value * bpmMult;
+  bpmMult = 16 / columnsEl.value;
+  updateBpm();
   if(isPlaying) {
     play();
   }
