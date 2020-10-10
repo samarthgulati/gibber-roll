@@ -17,38 +17,44 @@
       <article>
         <label for="">
           <h5>Synth</h5>
-          <fly-out>
-            <button slot="label">&#9881;</button>
-            <div slot="flyout" hidden>
-              <div>
-                <label for="instRevEl">Instr Rev</label>
-                <input type="number" step="0.1" min="0" max="1" value="0.5" id="instRevEl" />
+          <span>
+            <button id="remixInst">&#128256;</button>
+            <fly-out>
+              <button slot="label">&#9881;</button>
+              <div slot="flyout" hidden>
+                <div>
+                  <label for="instRevEl">Inst. Rev</label>
+                  <input type="number" step="0.1" min="0" max="1" value="0.5" id="instRevEl" />
+                </div>
+                <div>
+                  <label for="instDelayEl">Inst. Delay</label>
+                  <input type="number" step="0.1" min="0" max="1" value="0.5" id="instDelayEl" />
+                </div>
               </div>
-              <div>
-                <label for="instDelayEl">Instr Delay</label>
-                <input type="number" step="0.1" min="0" max="1" value="0.5" id="instDelayEl" />
-              </div>
-            </div>
-          </fly-out>
+            </fly-out>
+          </span>
         </label>
         <div id="synthLabels"></div>
       </article>
       <article>
         <label for="">
           <h5>Drums</h5>
-          <fly-out>
-            <button slot="label">&#9881;</button>
-            <div slot="flyout" hidden>
-              <div>
-                <label for="drumRevEl">Drum Rev</label>
-                <input type="number" step="0.1" min="0" max="1" value="0" id="drumRevEl" />
+          <span>
+            <button id="remixDrums">&#128256;</button>
+            <fly-out>
+              <button slot="label">&#9881;</button>
+              <div slot="flyout" hidden>
+                <div>
+                  <label for="drumRevEl">Drum Rev</label>
+                  <input type="number" step="0.1" min="0" max="1" value="0" id="drumRevEl" />
+                </div>
+                <div>
+                  <label for="drumDelayEl">Drum Delay</label>
+                  <input type="number" step="0.1" min="0" max="1" value="0" id="drumDelayEl"/>
+                </div>
               </div>
-              <div>
-                <label for="drumDelayEl">Drum Delay</label>
-                <input type="number" step="0.1" min="0" max="1" value="0" id="drumDelayEl"/>
-              </div>
-            </div>
-          </fly-out>
+            </fly-out>
+          </span>
         </label>
         <div id="drumLabels"></div>
       </article>
@@ -121,8 +127,10 @@
     <button id="code">Copy Code</button>
     <button id="clear">Clear</button>
   </nav>
-  <script src="lib/fly-out.js"></script>
-  <script src="lib/json-url/json-url.js"></script>
+  <script src="./lib/fly-out.js"></script>
+  <script src="./lib/json-url/json-url.js"></script>
+  <script src="./beats_n_melodies/sixteenBeats.js"></script>
+  <script src="./beats_n_melodies/sixteenMelodies.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

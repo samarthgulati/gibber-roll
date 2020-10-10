@@ -1,21 +1,21 @@
 var melodies = {
     house1: {
         bpmMult: 1,
-        instrument: 'Monosynth',
+        instrumentEl: 'Monosynth',
         presetEl: 'bass',
         delayEl: 0.7,
         reverbEl: 0.8,
-        stepsObj: { "0": "................", "1": "..x...x.........", "2": "x...x...........", "3": "................", "4": "................", "5": "................", "6": "................", "7": "............x.x.", "8": "..........x.....", "9": "................", "10": "................", "11": "................", "12": "................", "13": "................", "14": "................", "15": "................" },
+        stepsObj: { "1": "..x...x.........", "2": "x...x...........", "7": "............x.x.", "8": "..........x....." },
     },
     bellaCiao: {
         bpmMult: 0.5,
-        instrument: 'Monosynth',
+        instrumentEl: 'Monosynth',
         presetEl: 'shinybass2',
         stepsObj: { "4": "x.....x.........x.....x.........", "6": "..x...............x.............", "7": "....x...............x...........", "-1": "..............x................." },
     },
     canYouFeelIt: {
         bpmMult: 0.5,
-        instrument: 'Monosynth',
+        instrumentEl: 'Monosynth',
         presetEl: 'shinybass',
         delayEl: 0.7,
         reverbEl: 0.8,
@@ -23,7 +23,7 @@ var melodies = {
     },
     acid1: {
         bpmMult: 0.5,
-        instrument: 'PolySynth',
+        instrumentEl: 'PolySynth',
         presetEl: 'acidBass',
         delayEl: 0.5,
         delayTimeEl: 1 / 4,

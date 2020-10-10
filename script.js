@@ -3,6 +3,8 @@ var codeBtn = document.querySelector('#code');
 var loadBtn = document.querySelector('#load');
 var clearBtn = document.querySelector('#clear');
 var saveBtn = document.querySelector('#save');
+var remixInstBtn = document.querySelector('#remixInst');
+var remixDrumsBtn = document.querySelector('#remixDrums');
 var playPause = document.querySelector('#playPause');
 var instrumentEl = document.querySelector('#instrumentEl');
 var presetEl = document.querySelector('#presetEl');
@@ -105,8 +107,8 @@ function setupTable() {
   updateLabels();
 }
 
-function playNote(instr, note) {
-  if(instr !== 'drums') {
+function playNote(inst, note) {
+  if(inst !== 'drums') {
     // instrument.stop();
     previewInstrument.note(Number(note) + Number(transposeEl.value) * incBy);
     return;
@@ -239,12 +241,12 @@ function updateInstrument(e) {
     updatePresets();
   }
   var preset = presetEl.value === '' ? undefined : presetEl.value;
-  if (instrument != undefined) instrument.clear();
+  if (instrument !== undefined) instrument.clear();
   instrument = window[instrumentEl.value](preset);
   instrument.connect( reverb, Number(instRevEl.value) );
   instrument.connect( delay, Number(instDelayEl.value) );
 
-  if (previewInstrument != undefined) previewInstrument.clear();
+  if (previewInstrument !== undefined) previewInstrument.clear();
   previewInstrument = window[instrumentEl.value](preset);
   if(isPlaying) {
     play();
@@ -252,6 +254,8 @@ function updateInstrument(e) {
 }
 
 function clearGrid() {
+  stepsObj = {};
+  drumStepsObj = {};
   var onCells = table.querySelectorAll('.on');
   for(var i = 0; i < onCells.length; i++) {
     onCells[i].classList.remove('on');
@@ -393,6 +397,7 @@ function save() {
 function updateGridFromObj() {
   for(var i = 0; i < notes.length; i++) {
     var note = notes[i];
+    if(!(note in stepsObj)) continue;
     var noteEl = steps[note];
     var cellState = stepsObj[note].split('');
     for(var j = 0; j < noteEl.children.length; j++) {
@@ -405,6 +410,7 @@ function updateGridFromObj() {
 
   for(var k = 0; k < drumNotes.length; k++) {
     var note = drumNotes[k];
+    if(!(note in drumStepsObj)) continue;
     var noteEl = drumSteps[note];
     var cellState = drumStepsObj[note].split('');
     for(var l = 0; l < noteEl.children.length; l++) {
@@ -424,6 +430,8 @@ function loadState(state) {
     if(key.endsWith('El')) {
       window[key].value = state[key];
     } else if(key.endsWith('Obj')) {
+      window[key] = state[key];
+    } else {
       window[key] = state[key];
     }
   }
@@ -593,6 +601,53 @@ function copyCodeToClipboard() {
   document.body.removeChild(textArea);
 }
 
+function getRandomState(states) {
+  var keys = Object.keys(states);
+  var keyIdx = Math.floor(Math.random() * keys.length);
+  var key = keys[keyIdx];
+  return Object.assign({}, states[key]);
+}
+
+function remixInst() {
+  var isPlaying = playPause.textContent !== '►';
+  if(isPlaying) {
+    stop();
+  }
+  var state = getRandomState(melodies);
+  console.log(state);
+  
+  var notes = Object.keys(state.stepsObj);
+  var min = Infinity;
+  var max = -Infinity;
+  for(var j = 0; j < notes.length; j++) {
+    var note = Number(notes[j]);
+    min = Math.min(note, min);
+    max = Math.max(note, max);
+  }
+  var range = max - min;
+  state['transposeEl'] = min;
+  state['rowsEl'] = Math.max(range, 16);
+  state['columnsEl'] = state.stepsObj[notes[0]].length;
+  loadState(state);
+  if(isPlaying) {
+    play();
+  }
+}
+
+function remixDrums() {
+  var isPlaying = playPause.textContent !== '►';
+  if(isPlaying) {
+    stop();
+  }
+  var state = getRandomState(drumBeats);
+  var notes = Object.keys(state.drumStepsObj);
+  state['columnsEl'] = state.drumStepsObj[notes[0]].length;
+  loadState(state);
+  if(isPlaying) {
+    play();
+  }
+}
+
 clearBtn.addEventListener('click', clearGrid);
 saveBtn.addEventListener('click', save);
 loadBtn.addEventListener('click', loadGibber);
@@ -615,5 +670,6 @@ drumDelayEl.addEventListener('change', updateDrumDelay);
 instDelayEl.addEventListener('change', updateInstrumentDelay);
 delayTimeEl.addEventListener('change', updateDelayTime);
 codeBtn.addEventListener('click', copyCodeToClipboard);
-
+remixInstBtn.addEventListener('click', remixInst);
+remixDrumsBtn.addEventListener('click', remixDrums);
 setupTable();

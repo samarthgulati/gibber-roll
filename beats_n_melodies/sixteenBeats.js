@@ -3,7 +3,7 @@
 // For a more complete version with TidalCycles, check out
 // https://gist.github.com/khoparzi/622b7892a95444a2ee9930d432561985
 
-var beats = {
+var drumBeats = {
     fourOnFloor: {
         drumStepsObj: { "ch": "x.x.x.x.x.x.x.x.", "sd": "....x.......x...", "kd": "x.......x......." },
         bpmMult: 1
