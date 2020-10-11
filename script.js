@@ -63,6 +63,9 @@ var delay;
 // var instrumentDelay = 0.5;
 var delayTime;
 
+var currBeat = 0;
+var startTime = 0;
+
 function setupColumns(idx, row, instrument, note) {
   var columns = Number(columnsEl.value);
   for (var c = 0; c < columns; c++) {
@@ -165,6 +168,11 @@ function updateSequence() {
 
 function stop() {
   if(!sequencer) return;
+  var playingCells = document.querySelectorAll('td.playing');
+  for(var i = 0; i < playingCells.length; i++) {
+    playingCells[i].classList.remove('playing');
+  }
+  currBeat = 0;
   sequencer.stop();
   drumSequencer.stop();
   playPause.textContent = '►';
@@ -182,6 +190,25 @@ function transposedSteps() {
   return transposedStepsObj;
 }
 
+function animatePlayHead() {
+  var t = Date.now() - startTime;
+  if(playPause.textContent === '►') return
+  requestAnimationFrame(animatePlayHead);
+  var rows = document.querySelectorAll('tr');
+  if(!rows[0].children[currBeat].classList.contains('playing')) {
+    var prevBeat = (columnsEl.value + currBeat - 1) % columnsEl.value;
+    for(var i = 0; i < rows.length; i++) {
+      rows[i].children[prevBeat].classList.remove('playing');
+      rows[i].children[currBeat].classList.add('playing');
+    }
+  }
+  var beatFromTime = Math.floor(t / (15000/bpmEl.value)) % columnsEl.value;
+  
+  if(beatFromTime != currBeat) {
+    currBeat = beatFromTime;
+  }
+}
+
 function play() {
   updateSequence();
   var transposedStepsObj = transposedSteps();
@@ -189,6 +216,8 @@ function play() {
   drumSequencer = Gibber.Steps(drumStepsObj, drums);
   playPause.textContent = '■';
   playPause.classList.add('playing');
+  startTime = Date.now();
+  animatePlayHead();
 }
 
 function togglePlayPause() {

@@ -202,6 +202,10 @@ div[slot="flyout"] > div:last-of-type {
   border: none;
 }
 
+td.playing {
+  box-shadow: 0 0 0px 4rem hsla(0, 0%, 100%, 0.7) inset;
+}
+
 td.on {
   background: hsl(var(--h), var(--s), 50%);
 }
