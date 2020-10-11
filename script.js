@@ -132,6 +132,8 @@ function handleTableClick(e) {
   }
   if(isPlaying) {
     play();
+  } else {
+    updateSequence();
   }
 }
 
