@@ -272,6 +272,9 @@ function updateInstrument(e) {
   }
   var preset = presetEl.value === '' ? undefined : presetEl.value;
   if (instrument !== undefined) instrument.clear();
+  if (instrumentEl.value === "Freesound") {
+    preset = presetText.value === '' ? 0 : presetText.value;
+  }
   instrument = window[instrumentEl.value](preset);
   instrument.connect( reverb, Number(instRevEl.value) );
   instrument.connect( delay, Number(instDelayEl.value) );
@@ -310,14 +313,38 @@ function updateBpmSlider() {
   updateBpm();
 }
 
+function updateFreesound(key) {
+  if (key.key === 'Enter' || key.keyCode === 13) {
+    const presetText = document.querySelector('#presetText');
+    var preset = presetText.value === '' ? 0 : presetText.value;
+    instrument = window[instrumentEl.value](preset);
+    console.log("loaded sound preset: " + preset)
+    if (instrument !== undefined) {
+      instrument.connect(reverb, Number(instRevEl.value));
+      instrument.connect(delay, Number(instDelayEl.value));
+      previewInstrument = window[instrumentEl.value](preset);
+    } else console.log("couldn't get preset");
+  }
+}
+
 function updatePresets() {
-  presetEl.innerHTML = '<option value=""></option>';
-  var presets = Object.keys(Gibber.Audio.Presets.instruments[instrumentEl.value]);
-  for(var i = 0; i < presets.length; i++) {
-    var opt = document.createElement('option');
-    opt.value = presets[i];
-    opt.textContent = presets[i];
-    presetEl.appendChild(opt);
+  if (instrumentEl.value === "Freesound") {
+    const presetText = document.querySelector('#presetText');
+    presetText.value = 400;
+    presetText.style.display = "block";
+    presetEl.style.display = "none";
+    presetText.addEventListener('keypress', updateFreesound);
+  } else {
+    presetText.style.display = "none";
+    presetEl.display = "block";
+    presetEl.innerHTML = '<option value=""></option>';
+    var presets = Object.keys(Gibber.Audio.Presets.instruments[instrumentEl.value]);
+    for(var i = 0; i < presets.length; i++) {
+      var opt = document.createElement('option');
+      opt.value = presets[i];
+      opt.textContent = presets[i];
+      presetEl.appendChild(opt);
+    }
   }
 }
 
