@@ -50,7 +50,9 @@ aside > article > div {
   width: 100%;
 }
 aside fly-out {
-  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 aside label span {
   display: flex;
@@ -58,23 +60,43 @@ aside label span {
   width: 1.25rem;
   margin-left: -0.6rem;
 }
-aside label span fly-out {
-  top: -4rem;
-}
-aside button {
+.icon-button {
   background: none;
   border: none;
-  font-size: 1.25rem;
   margin: 0;
   padding: 0;
   cursor: pointer;
+  display: flex;
 }
+
+.icon-button > svg {
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.icon-button:disabled > svg,
+.icon-button:disabled > svg:hover {
+  --fill: grey !important;
+  cursor: not-allowed;
+}
+
+.icon-button > svg:hover,
+.icon-button > svg:active,
+.icon-button > svg:focus {
+  fill: #1560F7;
+  --fill: #1560F7 !important;
+}
+
+aside fly-out > button {
+  margin-left: -0.125rem;
+}
+
 aside fly-out > div[slot="flyout"] {
   flex-direction: row;
   padding: 0;
   position: absolute;
-  top: 3.5rem;
-  left: 3rem;
+  top: 0rem;
+  left: 2.2rem;
   height: 2.75rem;
 }
 aside fly-out > div[slot="flyout"] > div {
@@ -171,6 +193,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-around;
+  border-top: 1px solid black;
 }
 nav div:not([slot]) {
   display: flex;
@@ -187,10 +210,33 @@ nav > div {
   margin-top: -1rem;
 }
 
+nav > fly-out > button {
+  border-radius: 1rem;
+  border: 1px solid grey;
+  background: #efefef;
+  color: #020202;
+  padding: 0.25rem 1rem 0.35rem;
+}
+
+nav > fly-out > button:hover,
+nav > fly-out > button:focus {
+  background: #1560F7;
+  color: white;
+}
+
+select,
+input,
+#octDown,
+#octUp {
+  border-radius: 1rem;
+  border: 1px solid grey;
+}
+
 div[slot="flyout"] {
   font-family: monospace;
   top: initial;
   bottom: 2rem;
+  border-radius: 1rem;
 }
 
 div[slot="flyout"] > div {
@@ -219,24 +265,18 @@ td.on.dark:hover {
   background-image: none;
   border: none;
   outline: none;
-  background: #1560F7;
+  fill: #1560F7;
   width: 3rem;
   height: 3rem;
   border-radius: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 1.5rem;
   margin: 0;
   padding: 0;
-  padding-left: 0.25rem;
-  padding-top: 0.25rem;
+  background: white;
 }
 #playPause.playing {
-  padding: 0;
-  padding-right: 0.13rem;
-  padding-bottom: 0.25rem;
   background: #efefef;
   color: #1560F7;
   font-size: 4rem;
@@ -248,6 +288,25 @@ td.on.dark:hover {
 #playPause:active {
   filter: drop-shadow(0 0 4px rgb(30, 30, 30));
 }
+
+#playPause.playing > #stop {
+  display: block;
+  transform: scale(1.5);
+}
+
+#playPause > #stop {
+  display: none;
+}
+
+#playPause.playing > #play {
+  display: none;
+}
+
+#playPause > #play {
+  display: block;
+  transform: scale(2.25);
+}
+
 #overlay {
   position: absolute;
   left: 0;
@@ -267,4 +326,19 @@ button {
 
 input, button, td {
   cursor: pointer;
+}
+
+#gibber {
+  display: flex;
+  align-items: center;
+  background: black;
+  padding: 0.45rem 0.5rem 0.5rem;
+  border-radius: 1.5rem;
+  color: white;
+  text-decoration: none;
+  fill: white;
+}
+
+#gibber:hover {
+  background: #1560F7;
 }

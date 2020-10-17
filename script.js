@@ -120,7 +120,7 @@ function playNote(inst, note) {
 }
 
 function handleTableClick(e) {
-  var isPlaying = playPause.textContent !== '►';
+  var isPlaying = playPause.classList.contains('playing');
   if(isPlaying) {
     stop();
   }
@@ -177,7 +177,7 @@ function stop() {
   currBeat = 0;
   sequencer.stop();
   drumSequencer.stop();
-  playPause.textContent = '►';
+  // playPause.textContent = '►';
   playPause.classList.remove('playing');
 }
 
@@ -194,7 +194,7 @@ function transposedSteps() {
 
 function animatePlayHead() {
   var t = Date.now() - startTime;
-  if(playPause.textContent === '►') return
+  if(!playPause.classList.contains('playing')) return
   requestAnimationFrame(animatePlayHead);
   var rows = document.querySelectorAll('tr');
   if(!rows[0].children[currBeat].classList.contains('playing')) {
@@ -216,14 +216,14 @@ function play() {
   var transposedStepsObj = transposedSteps();
   sequencer = Gibber.Steps(transposedStepsObj, instrument);
   drumSequencer = Gibber.Steps(drumStepsObj, drums);
-  playPause.textContent = '■';
+  // playPause.textContent = '■';
   playPause.classList.add('playing');
   startTime = Date.now();
   animatePlayHead();
 }
 
 function togglePlayPause() {
-  if(playPause.textContent === '►') {
+  if(!playPause.classList.contains('playing')) {
     play();
   } else {
     stop();
@@ -263,7 +263,7 @@ function loadGibber() {
 }
 
 function updateInstrument(e) {
-  var isPlaying = playPause.textContent !== '►';
+  var isPlaying = playPause.classList.contains('playing');
   if(isPlaying) {
     stop();
   }
@@ -290,7 +290,7 @@ function clearGrid() {
   for(var i = 0; i < onCells.length; i++) {
     onCells[i].classList.remove('on');
   }
-  var isPlaying = playPause.textContent !== '►';
+  var isPlaying = playPause.classList.contains('playing');
   if(isPlaying) {
     stop();
   }
@@ -346,7 +346,7 @@ function updateLabels() {
 }
 
 function updateTranspose(e) {
-  var isPlaying = playPause.textContent !== '►';
+  var isPlaying = playPause.classList.contains('playing');
   if(isPlaying) {
     stop();
   }
@@ -512,7 +512,7 @@ function load() {
 }
 
 function updateColumns() {
-  var isPlaying = playPause.textContent !== '►';
+  var isPlaying = playPause.classList.contains('playing');
   if(isPlaying) {
     stop();
   }
@@ -546,7 +546,7 @@ function updateColumns() {
 }
 
 function updateRows() {
-  var isPlaying = playPause.textContent !== '►';
+  var isPlaying = playPause.classList.contains('playing');
   if(isPlaying) {
     stop();
   }
@@ -626,10 +626,10 @@ function copyCodeToClipboard() {
   try {
 		var successful = document.execCommand('copy');
     if(successful) {
-			codeBtn.textContent = 'Copied';
+			// codeBtn.textContent = 'Copied';
 			codeBtn.setAttribute('disabled', true);
 			setTimeout(function() {
-				codeBtn.textContent = 'Copy Code';
+				// codeBtn.textContent = 'Copy Code';
 				codeBtn.removeAttribute('disabled');
 			}, 500);
 		}
@@ -666,7 +666,7 @@ function matchNotesToColumnCount(stepsObj, columns) {
 }
 
 function remixInst() {
-  var isPlaying = playPause.textContent !== '►';
+  var isPlaying = playPause.classList.contains('playing');
   if(isPlaying) {
     stop();
   }
@@ -696,7 +696,7 @@ function remixInst() {
 }
 
 function remixDrums() {
-  var isPlaying = playPause.textContent !== '►';
+  var isPlaying = playPause.classList.contains('playing');
   if(isPlaying) {
     stop();
   }
