@@ -85,6 +85,7 @@ function setupTable() {
   var rows = Number(rowsEl.value);
   bpmMult = 16 / Number(columnsEl.value);
   document.body.style.setProperty('--rows', rows);
+  notes = [];
   for(var r = 0; r < rows; r++) {
     var note = (rows - r - 1) * incBy;
     notes.push(note);
@@ -93,7 +94,6 @@ function setupTable() {
     synthLabelsEl.appendChild(document.createElement('span'));
     setupColumns(r, steps[note], 'synth', note);
   }
-
   for(var d = 0; d < drumNotes.length; d++) {
     var note = drumNotes[d];
     drumSteps[note] = document.createElement('tr');
@@ -644,6 +644,7 @@ function getRandomState(states) {
   var keys = Object.keys(states);
   var keyIdx = Math.floor(Math.random() * keys.length);
   var key = keys[keyIdx];
+  console.log(key);
   return Object.assign({}, states[key]);
 }
 
@@ -672,17 +673,21 @@ function remixInst() {
   var state = getRandomState(melodies);
   
   var notes = Object.keys(state.stepsObj);
-  var min = Infinity;
-  var max = -Infinity;
-  for(var j = 0; j < notes.length; j++) {
-    var note = Number(notes[j]);
-    min = Math.min(note, min);
-    max = Math.max(note, max);
+  notes.sort();
+  var min = notes[0];
+  var max = notes[notes.length - 1];
+  // remapStepsObj to 0
+  if(min < 0) {
+    var stepsObj = {};
+    for(var j = 0; j < notes.length; j++) {
+      stepsObj[j] = state.stepsObj[notes[j]];
+    }
+    state.stepsObj = stepsObj;
   }
   var range = max - min;
   state['transposeEl'] = min;
   state['rowsEl'] = Math.max(range, 16);
-  state['columnsEl'] = state.stepsObj[notes[0]].length;
+  state['columnsEl'] = state.stepsObj[Object.keys(state.stepsObj)[0]].length;
   state.drumStepsObj = matchNotesToColumnCount(drumStepsObj, state['columnsEl']);
   loadState(state);
   if(isPlaying) {
