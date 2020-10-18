@@ -593,19 +593,28 @@ function getCode() {
     }
   }
   return `
+// Define the BPM
 Clock.bpm = ${bpmEl.value * bpmMult};
+
+// Define the effects we will use
 reverb = Bus2().fx.add( Freeverb() );
 delayFX = Delay({ time: 1 / 6, feedback: .75 });
 delay = Bus2().fx.add( delayFX );
-instrument = ${instrumentEl.value}(${presetEl.value});
+// Define the instruments
+instrument = ${instrumentEl.value}('${presetEl.value}');
 drums = Drums();
+// Some mixing controls
 reverb.gain = ${reverbEl.value};
 delay.gain = ${delayEl.value};
 delayFX.time = 1 / ${delayTimeEl.value};
+
+// Connect the FX to the instruments
 instrument.connect(reverb, ${instRevEl.value});
 drums.connect(reverb, ${drumRevEl.value});
 instrument.connect(delay, ${instDelayEl.value});
 drums.connect(delay, ${drumDelayEl.value});
+
+// Make a sequence
 sequencer = Gibber.Steps(${JSON.stringify(transposedStepsObj)}, instrument);
 drumSequencer = Gibber.Steps(${JSON.stringify(drumStepsObjCopy)}, drums);`;
 }
